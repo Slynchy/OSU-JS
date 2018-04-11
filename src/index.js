@@ -23,37 +23,37 @@ SetRendererProperties(Application.renderer.view);
 PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
 Application.ticker.minFPS = 60;
 window.addEventListener('resize', function() {
-  renderer.resize(Settings.applicationSettings.width, Settings.applicationSettings.height);
+	renderer.resize(Settings.applicationSettings.width, Settings.applicationSettings.height);
 });
 
 const flowController = (global.flowController = require('./flowController.js'));
 
 Application.ticker.add(delta => {
-  'use strict';
-  let deltaTime = application.ticker.elapsedMS;
+	'use strict';
+	let deltaTime = application.ticker.elapsedMS;
 
-  if (flowController.currentAction) flowController.currentAction();
+	if (flowController.currentAction) flowController.currentAction();
 
-  if (flowController && flowController.game) flowController.game.physicsStep(deltaTime);
+	if (flowController && flowController.game) flowController.game.physicsStep(deltaTime);
 
-  for (let i = 0; i < tokens.length; i++) {
-    if (!tokens[i]._queuedForDestruction && tokens[i].startStep) {
-      tokens[i].startStep(deltaTime);
-    }
-  }
-  for (let i = 0; i < tokens.length; i++) {
-    if (!tokens[i]._queuedForDestruction && tokens[i].endStep) {
-      tokens[i].endStep(deltaTime);
-    }
-  }
-  for (let i = tokens.length - 1; i >= 0; i--) {
-    if (tokens[i]._queuedForDestruction) {
-      tokens[i] = null;
-      tokens.splice(i, 1);
-    }
-  }
+	for (let i = 0; i < tokens.length; i++) {
+		if (!tokens[i]._queuedForDestruction && tokens[i].startStep) {
+			tokens[i].startStep(deltaTime);
+		}
+	}
+	for (let i = 0; i < tokens.length; i++) {
+		if (!tokens[i]._queuedForDestruction && tokens[i].endStep) {
+			tokens[i].endStep(deltaTime);
+		}
+	}
+	for (let i = tokens.length - 1; i >= 0; i--) {
+		if (tokens[i]._queuedForDestruction) {
+			tokens[i] = null;
+			tokens.splice(i, 1);
+		}
+	}
 });
 
 if (module.hot) {
-  module.hot.accept();
+	module.hot.accept();
 }

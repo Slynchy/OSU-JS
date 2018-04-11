@@ -1,4 +1,5 @@
 const path = require('path');
+//"prettier": "prettier --single-quote --print-width 100 --tab-width 4 --use-tabs \"./src/**/*.js\" --write",
 
 // https://github.com/TheHappyKoala/Blast-Off/blob/master/webpack.config.js <3
 const webpack = require('webpack');
