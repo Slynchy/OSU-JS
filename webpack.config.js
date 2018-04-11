@@ -51,7 +51,7 @@ if (isProduction) {
 }
 
 module.exports = {
-	entry: ['./src/index.js'],
+	entry: ['babel-polyfill', './src/index.js'],
 	module: {
 		rules
 	},
