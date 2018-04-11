@@ -1,0 +1,61 @@
+{
+  "name": "osu-js",
+  "version": "0.1.0",
+  "description": "Prototype port of Osu! to JavaScript",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier --single-quote --print-width 100 \"./src/**/*.js\" --write",
+    "dev": "webpack --config webpack.config.js"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
+  "author": "Sam Lynch",
+  "license": "MIT",
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "plugins": [],
+    "rules": {
+      "no-console": "off",
+      "no-undef": 0,
+      "no-unused-vars": "off",
+      "max-len": [
+        1,
+        120,
+        2,
+        {
+          "ignoreComments": true
+        }
+      ],
+      "prop-types": [
+        0
+      ]
+    },
+    "extends": [
+      "eslint:recommended"
+    ]
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "prop-types": "^15.6.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-eslint": "^8.2.2",
+    "babel-loader": "^7.1.2",
+    "css-loader": "^0.28.10",
+    "eslint": "^4.19.1",
+    "eslint-loader": "^2.0.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "html-webpack-plugin": "^3.0.6",
+    "osu-json": "^0.8.1",
+    "pixi.js": "^4.7.3",
+    "webpack": "^3.10.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^2.4.1"
+  }
+}
