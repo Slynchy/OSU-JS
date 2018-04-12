@@ -2,6 +2,7 @@
     (/・ω・)/
  */
 
+import './styles/app.css';
 const PIXI = (global.PIXI = require('pixi.js'));
 
 require('./engine/MiscPolyfills.js');
@@ -12,18 +13,19 @@ const Leaderboards = (global.Leaderboards = require('./engine/gamesparks/FBLeade
 const AdAPI = (global.AdAPI = require('./engine/Adverts.js'));
 const SaveData = (global.SaveData = require('./engine/SaveData.js'));
 const AudioAPI = (global.AudioAPI = require('./engine/Audio.js'));
+const AssetLoader = (global.AssetLoader = require('./engine/AssetLoader.js'));
 const Analytics = (global.Analytics = require('./engine/Analytics.js'));
 const Easing = (global.Easing = require('./engine/Easing.js'));
 const Tokens = (global.Tokens = []);
-const Application = (global.Application = new PIXI.Application(Settings.applicationSettings));
 
+PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
+const Application = (global.Application = new PIXI.Application(Settings.applicationSettings));
 Application.renderer.backgroundColor = Settings.applicationSettings.backgroundColor;
 document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
-PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
-Application.ticker.minFPS = 60;
+
 window.addEventListener('resize', function() {
-	renderer.resize(Settings.applicationSettings.width, Settings.applicationSettings.height);
+    Application.renderer.resize(Settings.applicationSettings.width, Settings.applicationSettings.height);
 });
 
 const flowController = (global.flowController = require('./flowController.js'));
@@ -32,7 +34,8 @@ Application.ticker.add(delta => {
 	'use strict';
 	let deltaTime = Application.ticker.elapsedMS;
 
-	if (flowController.currentAction) flowController.currentAction();
+	if (flowController.currentAction)
+		flowController.currentAction();
 
 	for (let i = 0; i < Tokens.length; i++) {
 		if (!Tokens[i]._queuedForDestruction && Tokens[i].startStep) {

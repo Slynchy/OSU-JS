@@ -21,12 +21,12 @@ class Settings {
 
 		this.applicationSettings = {
 			// REQUIRED
-			width: 790,
-			height: 1280,
+			width: 1350,
+			height: 720,
 			sharedTicker: true,
 			autoStart: false,
-			backgroundColor: 0xb20000,
-			scaleMode: 1, // 0 == linear, 1 == nearest
+			backgroundColor: 0x000000,
+			scaleMode: 0, // 0 == linear, 1 == nearest
 
 			// unneeded
 			antialias: true,
@@ -55,7 +55,7 @@ class Settings {
 		};
 
 		this.Leaderboards = {
-			leaderboard_names: ['Global'],
+			leaderboard_names: [],
 			offlineMode: true
 		};
 
