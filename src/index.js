@@ -25,7 +25,10 @@ document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
 
 window.addEventListener('resize', function() {
-    Application.renderer.resize(Settings.applicationSettings.width, Settings.applicationSettings.height);
+	Application.renderer.resize(
+		Settings.applicationSettings.width,
+		Settings.applicationSettings.height
+	);
 });
 
 const flowController = (global.flowController = require('./flowController.js'));
@@ -34,23 +37,22 @@ Application.ticker.add(delta => {
 	'use strict';
 	let deltaTime = Application.ticker.elapsedMS;
 
-	if (flowController.currentAction)
-		flowController.currentAction();
+	if (flowController.currentAction) flowController.currentAction();
 
 	for (let i = 0; i < Tokens.length; i++) {
 		if (!Tokens[i]._queuedForDestruction && Tokens[i].startStep) {
-        Tokens[i].startStep(deltaTime);
+			Tokens[i].startStep(deltaTime);
 		}
 	}
 	for (let i = 0; i < Tokens.length; i++) {
 		if (!Tokens[i]._queuedForDestruction && Tokens[i].endStep) {
-        Tokens[i].endStep(deltaTime);
+			Tokens[i].endStep(deltaTime);
 		}
 	}
 	for (let i = Tokens.length - 1; i >= 0; i--) {
 		if (Tokens[i]._queuedForDestruction) {
-        Tokens[i] = null;
-        Tokens.splice(i, 1);
+			Tokens[i] = null;
+			Tokens.splice(i, 1);
 		}
 	}
 });
