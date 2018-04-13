@@ -1,6 +1,5 @@
 class FlowController {
 	constructor() {
-		this.finishedLoading = false;
 		this.game = null;
 
 		if (!this.entry) {
@@ -18,7 +17,7 @@ class FlowController {
 	 * @param {Function} val
 	 */
 	set currentAction(val) {
-		if (typeof val !== 'function') throw new Error('Must be function param');
+		if (typeof(val) !== 'function') throw new Error('Must be function param');
 		this._currentAction = val;
 	}
 
@@ -32,18 +31,35 @@ class FlowController {
 
 	startLoading() {
 		console.log('[flowController] startLoading');
+
 		AssetLoader.LoadAssetsFromAssetList(Settings.resources).then(
 			() => {
-				console.log('success');
+				this.currentAction = this.finishedLoading;
+				console.log('[FlowController] Finished loading initial assets');
 			},
 			() => {
 				console.error('error');
 			}
 		);
+
 		this.currentAction = this.waitForLoading;
 	}
 
 	waitForLoading() {}
+
+	finishedLoading() {
+		"use strict";
+		this.currentAction = this.startGame;
+	}
+
+	startGame(){
+		this.game = AddToken(new Settings.flowSettings.gameToken());
+		this.currentAction = this.inGame;
+	}
+
+	inGame(){
+
+	}
 }
 
 module.exports = new FlowController();
