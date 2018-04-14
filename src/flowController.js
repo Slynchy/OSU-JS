@@ -1,5 +1,7 @@
 let osujson = require('osu-json');
-import osuFile from './assets/STYX_HELIX.osu.txt';
+let OSZHandler = require('./OSZHandler/OSZHandler.js');
+
+import osuFile from './assets/STYX_HELIX/STYX_HELIX.osu';
 
 class FlowController {
 	constructor() {
@@ -57,14 +59,19 @@ class FlowController {
 		osujson.ParseOSUFileAsync(osuFile).then(output => {
 			this._osuFile = output;
 			console.log(this._osuFile);
-			this.currentAction = this.startGame;
+			OSZHandler.HandleOSUFile(output).then(result => {
+				console.log(result);
+				this._osuFile = result;
+				this.currentAction = this.startGame;
+			});
 		});
 	}
 
 	waitForOsuFile() {}
 
 	startGame() {
-		this.game = AddToken(new Settings.flowSettings.gameToken());
+		console.log('[FlowController] startGame');
+		this.game = AddToken(new Settings.flowSettings.gameToken(this._osuFile));
 		this.currentAction = this.inGame;
 	}
 

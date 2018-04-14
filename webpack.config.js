@@ -21,7 +21,7 @@ const rules = [
         use: ['style-loader', 'css-loader']
     },
     {
-        test: /\.txt$/,
+        test: /\.(txt|osu)$/,
         use: 'raw-loader'
     },
     {
@@ -66,6 +66,8 @@ module.exports = {
     },
     devServer: {
         hot: true,
-        port: 3000
+        port: 3000,
+        overlay: true,
+        stats: "minimal"
     }
 };

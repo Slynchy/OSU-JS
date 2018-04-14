@@ -5,7 +5,7 @@ let ContainerObject = require('./engine/ContainerObject.js');
 let Button = require('./engine/Button.js');
 
 class Game extends Token {
-	constructor(props) {
+	constructor(osuFile, props) {
 		super({});
 
 		/*
@@ -13,8 +13,26 @@ class Game extends Token {
 		 */
 		this.name = 'Game';
 		this.scene = new ContainerObject();
+		this._osuFile = osuFile;
+
+		this.bg = new GameObject(
+			//this.activeTrack.bg,
+			t_white,
+			{
+				width: Settings.applicationSettings.width,
+				height: Settings.applicationSettings.height,
+				z: 0
+			}
+		);
+		this.scene.addChild(this.bg);
+
+		Application.stage.addChild(this.scene);
 
 		if (props) Object.assign(this, props);
+	}
+
+	get activeTrack() {
+		return this._osuFile;
 	}
 
 	endStep(delta) {

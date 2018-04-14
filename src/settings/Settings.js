@@ -9,7 +9,7 @@ class Settings {
 		this.SaveData = {
 			defaultSaveData: {}
 		};
-		
+
 		/**
 		 * @deprecated
 		 */

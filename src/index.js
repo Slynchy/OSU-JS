@@ -4,6 +4,7 @@
 
 import './styles/app.css';
 const PIXI = (global.PIXI = require('pixi.js'));
+const PIXISND = (global.PIXISND = require('pixi-sound'));
 
 require('./engine/MiscPolyfills.js');
 require('./engine/FBInstant.js');
