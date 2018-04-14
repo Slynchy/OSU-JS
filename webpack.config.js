@@ -21,6 +21,10 @@ const rules = [
         use: ['style-loader', 'css-loader']
     },
     {
+        test: /\.txt$/,
+        use: 'raw-loader'
+    },
+    {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: ['babel-loader']

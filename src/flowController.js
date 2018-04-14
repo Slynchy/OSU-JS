@@ -1,3 +1,6 @@
+let osujson = require('osu-json');
+import osuFile from './assets/STYX_HELIX.osu.txt';
+
 class FlowController {
 	constructor() {
 		this.game = null;
@@ -17,7 +20,7 @@ class FlowController {
 	 * @param {Function} val
 	 */
 	set currentAction(val) {
-		if (typeof(val) !== 'function') throw new Error('Must be function param');
+		if (typeof val !== 'function') throw new Error('Must be function param');
 		this._currentAction = val;
 	}
 
@@ -48,18 +51,24 @@ class FlowController {
 	waitForLoading() {}
 
 	finishedLoading() {
-		"use strict";
-		this.currentAction = this.startGame;
+		'use strict';
+		this.currentAction = this.waitForOsuFile;
+
+		osujson.ParseOSUFileAsync(osuFile).then(output => {
+			this._osuFile = output;
+			console.log(this._osuFile);
+			this.currentAction = this.startGame;
+		});
 	}
 
-	startGame(){
+	waitForOsuFile() {}
+
+	startGame() {
 		this.game = AddToken(new Settings.flowSettings.gameToken());
 		this.currentAction = this.inGame;
 	}
 
-	inGame(){
-
-	}
+	inGame() {}
 }
 
 module.exports = new FlowController();
