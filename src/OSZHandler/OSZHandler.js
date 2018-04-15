@@ -26,6 +26,7 @@ class OSZHandler {
 				.then(resources => {
 					result.track = STYX_HELIX_MP3;
 					result.bg = STYX_HELIX_BG;
+					result.data = osujson;
 					resolve(result);
 				})
 				.catch(err => {
