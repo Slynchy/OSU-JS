@@ -11,7 +11,7 @@ class CircleHitObject extends GameObject {
 	 * @param {Object} [props]
 	 */
 	constructor(x, y, type, hitsound, metadata, props) {
-		super(t_black);
+		super(t_whiteCircle);
 
 		this.interactive = true;
 
@@ -24,8 +24,6 @@ class CircleHitObject extends GameObject {
 		this.width = 100;
 		this.height = 100;
 		this.alpha = 0;
-
-		this._fadeInProgress = 0;
 
 		this.fadein = 0;
 		this.preempt = 0;
@@ -44,7 +42,8 @@ class CircleHitObject extends GameObject {
 	}
 
 	endStep(dt) {
-		this.alpha += dt / this.fadein;
+		if (this.alpha < 1) this.alpha += dt / this.fadein;
+		else this.alpha = 1;
 
 		if (Date.now() - this._startTime >= this.preempt) {
 			this.destroy();

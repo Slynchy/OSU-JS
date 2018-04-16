@@ -53,7 +53,9 @@ class Settings {
 
 		this.resources = {
 			t_black: 'black.png',
-			t_white: 'white.png'
+			t_white: 'white.png',
+			t_whiteCircle: 'white_circle.png',
+			t_redbg9s: 'redbg_9slice.png'
 		};
 
 		this.Leaderboards = {

@@ -4,6 +4,8 @@ let Text = require('./engine/Text.js');
 let ContainerObject = require('./engine/ContainerObject.js');
 let Button = require('./engine/Button.js');
 let CircleHitObject = require('./Objects/CircleHitObject.js');
+let NineSliceObject = require('./engine/NineSliceObject.js');
+let SliderHitObject = require('./Objects/SliderHitObject.js');
 
 class Game extends Token {
 	constructor(osuFile, props) {
@@ -79,19 +81,42 @@ class Game extends Token {
 
 			if (Math.floor(time * 1000) > current.time - 0 && !current.spawned) {
 				console.log(current.type.type);
-				this.scene.addChild(
-					new CircleHitObject(
-						current.x,
-						current.y,
-						current.type,
-						'hitsound',
-						{
-							fadein: this._fadein,
-							preempt: this._preempt
-						},
-						{}
-					)
-				);
+
+				let obj = null;
+
+				switch (current.type.type) {
+					case 'slider':
+						obj = new SliderHitObject(
+							current.x,
+							current.y,
+							current.type,
+							'hitsound', // todo
+							{
+								fadein: this._fadein,
+								preempt: this._preempt,
+								path: current.path
+							},
+							{}
+						);
+						break;
+					default:
+					case 'circle':
+						obj = new CircleHitObject(
+							current.x,
+							current.y,
+							current.type,
+							'hitsound', // todo
+							{
+								fadein: this._fadein,
+								preempt: this._preempt
+							},
+							{}
+						);
+						break;
+				}
+
+				this.scene.addChild(obj);
+
 				current.spawned = true;
 			}
 		}
