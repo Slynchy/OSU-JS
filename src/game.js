@@ -20,6 +20,7 @@ class Game extends Token {
 
 		this._fadein = this._calculateFadein(this.activeTrack.data['Difficulty']);
 		this._preempt = this._calculatePreempt(this.activeTrack.data['Difficulty']);
+		this._circleSize = 54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize'];
 
 		this.bg = new GameObject(
 			//this.activeTrack.bg,
@@ -94,7 +95,8 @@ class Game extends Token {
 							{
 								fadein: this._fadein,
 								preempt: this._preempt,
-								path: current.path
+								path: current.path,
+								circleSize: this._circleSize
 							},
 							{}
 						);
@@ -108,7 +110,8 @@ class Game extends Token {
 							'hitsound', // todo
 							{
 								fadein: this._fadein,
-								preempt: this._preempt
+								preempt: this._preempt,
+								circleSize: this._circleSize
 							},
 							{}
 						);

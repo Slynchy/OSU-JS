@@ -6,6 +6,12 @@ class SliderHitObject extends ContainerObject {
 	constructor(x, y, type, hitsound, metadata, props) {
 		super({});
 
+		this.fadein = 0;
+		this.preempt = 0;
+		this.circleSize = 0;
+		this._startTime = Date.now();
+		Object.assign(this, metadata);
+
 		this.x = x;
 		this.y = y;
 		this._pointerDown = null;
@@ -26,8 +32,8 @@ class SliderHitObject extends ContainerObject {
 		this.addChild(this.bg);
 
 		this.target = new GameObject(t_whiteCircle, {
-			width: 100,
-			height: 100,
+			width: this.circleSize * 2,
+			height: this.circleSize * 2,
 			interactive: true
 		});
 		this.target.on('pointerdown', this._handlePointerDown.bind(this));
@@ -43,11 +49,6 @@ class SliderHitObject extends ContainerObject {
 		// if (normalisedWidth < 0) normalisedWidth *= -1;
 		// this.bg.width += normalisedWidth;
 
-		this.fadein = 0;
-		this.preempt = 0;
-		this._startTime = Date.now();
-		Object.assign(this, metadata);
-
 		this.bg
 			.lineStyle(5, 0xff0000)
 			.moveTo(0, 0)
@@ -59,7 +60,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	expire() {
-		//this.destroy();
+		this.destroy();
 	}
 
 	endStep(dt) {
@@ -100,11 +101,6 @@ class SliderHitObject extends ContainerObject {
 			y: this._pointerDown.y - ev.data.global.y
 		};
 
-		let dist = {
-			x: Math.abs(this.path['end'].x - ev.data.global.x),
-			y: Math.abs(this.path['end'].y - ev.data.global.y)
-		};
-
 		// find closest point on path to the mouse
 		let closest = SliderHitObject.getClosestPointOnLines(
 			//ev.data.global,
@@ -131,6 +127,14 @@ class SliderHitObject extends ContainerObject {
 			x: ev.data.global.x,
 			y: ev.data.global.y
 		};
+
+		let a = this.x + this.target.x - this.path['end'].x;
+		let b = this.y + this.target.y - this.path['end'].y;
+		let dist = Math.sqrt(a * a + b * b);
+
+		if (dist < 1) {
+			this.score();
+		}
 	}
 
 	/* desc Static function. Find point on lines nearest test point

@@ -23,8 +23,8 @@ class Settings {
 
 		this.applicationSettings = {
 			// REQUIRED
-			width: 1350,
-			height: 720,
+			width: 512,
+			height: 384,
 			sharedTicker: true,
 			autoStart: false,
 			backgroundColor: 0x000000,

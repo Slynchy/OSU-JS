@@ -13,6 +13,12 @@ class CircleHitObject extends GameObject {
 	constructor(x, y, type, hitsound, metadata, props) {
 		super(t_whiteCircle);
 
+		this.fadein = 0;
+		this.preempt = 0;
+		this.circleSize = 0;
+		this._startTime = Date.now();
+		Object.assign(this, metadata);
+
 		this.interactive = true;
 
 		this.x = x;
@@ -20,15 +26,9 @@ class CircleHitObject extends GameObject {
 		this.z = 50;
 		this.type = type;
 		this.hitsound = hitsound;
-
-		this.width = 100;
-		this.height = 100;
 		this.alpha = 0;
 
-		this.fadein = 0;
-		this.preempt = 0;
-		this._startTime = Date.now();
-		Object.assign(this, metadata);
+		this.width = this.height = this.circleSize * 2;
 
 		this.on('pointerdown', this.onClick);
 
