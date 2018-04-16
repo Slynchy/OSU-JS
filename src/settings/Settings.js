@@ -55,7 +55,9 @@ class Settings {
 			t_black: 'black.png',
 			t_white: 'white.png',
 			t_whiteCircle: 'white_circle.png',
-			t_redbg9s: 'redbg_9slice.png'
+			t_redbg9s: 'redbg_9slice.png',
+			t_circleOutline: 'circle_outline.png',
+			snd_hitclap: 'STYX_HELIX/soft-hitclap3.wav'
 		};
 
 		this.Leaderboards = {

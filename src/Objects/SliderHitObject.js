@@ -31,9 +31,9 @@ class SliderHitObject extends ContainerObject {
 		this.bg = new PIXI.Graphics();
 		this.addChild(this.bg);
 
-		this.target = new GameObject(t_whiteCircle, {
-			width: this.circleSize * 2,
-			height: this.circleSize * 2,
+		this.target = new GameObject(t_circleOutline, {
+			width: this.circleSize,
+			height: this.circleSize,
 			interactive: true
 		});
 		this.target.on('pointerdown', this._handlePointerDown.bind(this));
@@ -41,6 +41,7 @@ class SliderHitObject extends ContainerObject {
 		this.target.on('pointermove', this._handlePointerMove.bind(this));
 		this.target.anchor.y = 0.5;
 		this.target.anchor.x = 0.5;
+		this.target._progress = 0;
 		this.addChild(this.target);
 
 		//this.rotation = Math.atan2(metadata.path['end'].y - y, metadata.path['end'].x - x);
@@ -49,12 +50,29 @@ class SliderHitObject extends ContainerObject {
 		// if (normalisedWidth < 0) normalisedWidth *= -1;
 		// this.bg.width += normalisedWidth;
 
-		this.bg
-			.lineStyle(5, 0xff0000)
-			.moveTo(0, 0)
-			.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
+		if (this.path['end']) {
+			// todo FIX THIS
+			this.bg
+				.lineStyle(5, 0xff0000)
+				.moveTo(0, 0)
+				.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
+		}
 
 		this.alpha = 0;
+		this._progressFadeIn = 0;
+		this._progressPreempt = 0;
+
+		this.outline = new GameObject(t_circleOutline, {
+			width: this.target.width,
+			height: this.target.height,
+			x: this.target.width / 2,
+			y: this.target.height / 2
+		});
+		this.outline.scale.x = 3;
+		this.outline.scale.y = 3;
+		this.outline.anchor.x = 0.5;
+		this.outline.anchor.y = 0.5;
+		this.target.addChild(this.outline);
 
 		if (props) Object.assign(this, props);
 	}
@@ -64,15 +82,44 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	endStep(dt) {
-		if (this.alpha < 1) this.alpha += dt / this.fadein;
-		else this.alpha = 1;
+		if (this._progressFadeIn < 1) this._progressFadeIn += dt / this.fadein;
+		else {
+			this._progressFadeIn = 1;
+		}
 
-		if (Date.now() - this._startTime >= this.preempt) {
+		this.alpha = this._progressFadeIn;
+
+		if (this._progressPreempt < 1) this._progressPreempt += dt / this.preempt;
+		else {
+			this._progressPreempt = 1;
+		}
+
+		this.outline.scale.x = 3 - 2 * this._progressPreempt;
+		this.outline.scale.y = 3 - 2 * this._progressPreempt;
+
+		if (this.isPointerDown()) {
+			this.target._progress += dt / this.duration;
+			if (this.target._progress >= 1) {
+				this.score();
+				return;
+			}
+
+			this.target.x = lerp(0, this.path['end'].x - this.x, this.target._progress);
+			this.target.y = lerp(0, this.path['end'].y - this.y, this.target._progress);
+		} else if (Date.now() - this._startTime >= this.preempt) {
 			this.expire();
 		}
 	}
 
 	score() {
+		snd_hitclap.sound.play();
+
+		if (this.game) {
+			this.game.addScore(50);
+		} else {
+			throw new Error('No game reference on object!');
+		}
+
 		this.destroy();
 	}
 
@@ -85,7 +132,14 @@ class SliderHitObject extends ContainerObject {
 			x: ev.data.global.x,
 			y: ev.data.global.y
 		};
+
+		snd_hitclap.sound.play();
+
+		// start moving the ball
+		this._startMovingTarget();
 	}
+
+	_startMovingTarget() {}
 
 	_handlePointerUp(ev) {
 		console.log(ev);
@@ -120,8 +174,8 @@ class SliderHitObject extends ContainerObject {
 			]
 		);
 
-		this.target.x = closest.x;
-		this.target.y = closest.y;
+		//this.target.x = closest.x;
+		//this.target.y = closest.y;
 
 		this._pointerDown = {
 			x: ev.data.global.x,
