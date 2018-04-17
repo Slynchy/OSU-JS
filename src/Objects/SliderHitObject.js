@@ -38,6 +38,8 @@ class SliderHitObject extends ContainerObject {
 		});
 		this.target.on('pointerdown', this._handlePointerDown.bind(this));
 		this.target.on('pointerup', this._handlePointerUp.bind(this));
+		this.target.on('pointerupoutside', this._handlePointerUp.bind(this));
+		this.target.on('pointerout', this._handlePointerOut.bind(this));
 		this.target.on('pointermove', this._handlePointerMove.bind(this));
 		this.target.anchor.y = 0.5;
 		this.target.anchor.x = 0.5;
@@ -78,6 +80,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	expire() {
+		console.warn('expire');
 		this.destroy();
 	}
 
@@ -104,6 +107,8 @@ class SliderHitObject extends ContainerObject {
 				return;
 			}
 
+			// TODO: path['end'] is sometimes undefined for some reason?
+
 			this.target.x = lerp(0, this.path['end'].x - this.x, this.target._progress);
 			this.target.y = lerp(0, this.path['end'].y - this.y, this.target._progress);
 		} else if (Date.now() - this._startTime >= this.preempt) {
@@ -111,10 +116,11 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
-	score() {
+	score(timeOffset) {
 		snd_hitclap.sound.play();
 
 		if (this.game) {
+			//this.game.addScore(this.game._calculateScore(this.game.overallDifficulty, timeOffset));
 			this.game.addScore(50);
 		} else {
 			throw new Error('No game reference on object!');
@@ -127,6 +133,11 @@ class SliderHitObject extends ContainerObject {
 		return !!this._pointerDown;
 	}
 
+	_handlePointerOut(ev){
+		this._pointerDown = null;
+		this.expire();
+	}
+
 	_handlePointerDown(ev) {
 		this._pointerDown = {
 			x: ev.data.global.x,
@@ -134,61 +145,33 @@ class SliderHitObject extends ContainerObject {
 		};
 
 		snd_hitclap.sound.play();
-
-		// start moving the ball
-		this._startMovingTarget();
 	}
 
-	_startMovingTarget() {}
-
 	_handlePointerUp(ev) {
-		console.log(ev);
 		this._pointerDown = null;
-		this.score();
+		this.expire();
 	}
 
 	_handlePointerMove(ev) {
 		if (!this.isPointerDown()) return;
+
+		let a = this.x + this.target.x - ev.data.global.x;
+		let b = this.y + this.target.y - ev.data.global.y;
+		let dist = Math.sqrt(a * a + b * b);
+		if(dist > this.circleSize){
+			this.expire();
+			return;
+		}
 
 		let delta = {
 			x: this._pointerDown.x - ev.data.global.x,
 			y: this._pointerDown.y - ev.data.global.y
 		};
 
-		// find closest point on path to the mouse
-		let closest = SliderHitObject.getClosestPointOnLines(
-			//ev.data.global,
-			{
-				x: ev.data.global.x - this.x,
-				y: ev.data.global.y - this.y
-			},
-			[
-				{
-					x: 0,
-					y: 0
-				},
-				{
-					x: this.path['end'].x - this.x,
-					y: this.path['end'].y - this.y
-				}
-			]
-		);
-
-		//this.target.x = closest.x;
-		//this.target.y = closest.y;
-
 		this._pointerDown = {
 			x: ev.data.global.x,
 			y: ev.data.global.y
 		};
-
-		let a = this.x + this.target.x - this.path['end'].x;
-		let b = this.y + this.target.y - this.path['end'].y;
-		let dist = Math.sqrt(a * a + b * b);
-
-		if (dist < 1) {
-			this.score();
-		}
 	}
 
 	/* desc Static function. Find point on lines nearest test point

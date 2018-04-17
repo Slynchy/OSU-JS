@@ -54,8 +54,10 @@ class CircleHitObject extends GameObject {
 	onClick() {
 		snd_hitclap.sound.play();
 
+		let timeOffset = this.preempt * this._progressPreempt;
+
 		if (this.game) {
-			this.game.addScore(50);
+			this.game.addScore(this.game.calculateScore(this.game.overallDifficulty, this.preempt - timeOffset));
 		} else {
 			throw new Error('No game reference on object!');
 		}
@@ -75,7 +77,7 @@ class CircleHitObject extends GameObject {
 		this.outline.scale.x = 3 - 2 * this._progressPreempt;
 		this.outline.scale.y = 3 - 2 * this._progressPreempt;
 
-		if (Date.now() - this._startTime >= this.preempt) {
+		if (this._progressPreempt >= 1) {
 			this.destroy();
 		}
 	}

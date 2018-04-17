@@ -19,6 +19,7 @@ class Game extends Token {
 		this.scene = new ContainerObject();
 		this._osuFile = osuFile;
 
+		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
 		this._fadein = Game._calculateFadein(this.activeTrack.data['Difficulty']);
 		this._preempt = Game._calculatePreempt(this.activeTrack.data['Difficulty']);
 		this._circleSize = 54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize'];
@@ -46,6 +47,7 @@ class Game extends Token {
 				fill: '#ff0000'
 			})
 		});
+		this.scene.addChild(this.scoreDisplay);
 
 		Application.stage.addChild(this.scene);
 
@@ -85,6 +87,10 @@ class Game extends Token {
 		throw new Error('AR not a number!');
 	}
 
+	calculateScore(difficulty, timestamp){
+		return Game._calculateScore(difficulty, timestamp);
+	}
+
 	static _calculateFadein(difficulty) {
 		let AR = difficulty['ApproachRate'];
 
@@ -107,7 +113,8 @@ class Game extends Token {
 	 * @private
 	 */
 	static _calculateScore(difficulty, timestamp) {
-		let OD = difficulty['OverallDifficulty'];
+		//let OD = difficulty['OverallDifficulty'];
+		let OD = difficulty;
 
 		if (timestamp < 0) timestamp = Math.abs(timestamp);
 
@@ -119,7 +126,8 @@ class Game extends Token {
 			return 50;
 		}
 
-		throw new Error('Invalid timestamp');
+		return 0;
+		//throw new Error('Invalid timestamp');
 	}
 
 	_scheduleHitObjectSpawns() {
