@@ -6,7 +6,7 @@ let Button = require('./engine/Button.js');
 let CircleHitObject = require('./Objects/CircleHitObject.js');
 let NineSliceObject = require('./engine/NineSliceObject.js');
 let SliderHitObject = require('./Objects/SliderHitObject.js');
-let WAAClock = require('waaclock');
+let WebAudioScheduler = require('web-audio-scheduler');
 
 class Game extends Token {
 	constructor(osuFile, props) {
@@ -69,6 +69,7 @@ class Game extends Token {
 
 	_playTrack() {
 		this.__trackProgress = 0;
+		this._trackClock.start();
 		this.__trackInstance = this.activeTrack.track.play();
 		//this.__trackInstance.on('progress', this._onProgress.bind(this));
 	}
@@ -132,15 +133,15 @@ class Game extends Token {
 
 	_scheduleHitObjectSpawns() {
 		if (!this._trackClock) {
-			this._trackClock = new WAAClock(this.activeTrack.track.context.audioContext);
-			this._trackClock.start();
+			this._trackClock = new WebAudioScheduler({ context: this.activeTrack.track.context.audioContext });
 		}
 
 		for (let k in this.activeTrack.data['HitObjects']) {
 			let current = this.activeTrack.data['HitObjects'][k];
 
-			this.events.push(
-				this._trackClock.callbackAtTime(() => {
+			this._trackClock.insert(
+				current.time * 0.001,
+				() => {
 					switch (current.type.type) {
 						case 'slider':
 							this._spawnSlider(current);
@@ -150,15 +151,14 @@ class Game extends Token {
 							this._spawnCircle(current);
 							break;
 					}
-				}, current.time * 0.001)
+				}
 			);
 		}
 	}
 
 	_scheduleTimingPoints() {
 		if (!this._trackClock) {
-			this._trackClock = new WAAClock(this.activeTrack.track.context.audioContext);
-			this._trackClock.start();
+			this._trackClock = new WebAudioScheduler({ context: this.activeTrack.track.context.audioContext });
 		}
 
 		this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
@@ -166,10 +166,10 @@ class Game extends Token {
 		for (let i = 1; i < this.activeTrack.data['TimingPoints'].length; i++) {
 			let current = this.activeTrack.data['TimingPoints'][i];
 
-			this.events.push(
-				this._trackClock.callbackAtTime(() => {
-					this._setTimingPointData(current);
-				}, current.offset * 0.001)
+			this._trackClock.insert(
+				current.offset * 0.001,
+				this._setTimingPointData,
+				current
 			);
 		}
 	}
