@@ -57,7 +57,30 @@ class Settings {
 			t_whiteCircle: 'white_circle.png',
 			t_redbg9s: 'redbg_9slice.png',
 			t_circleOutline: 'circle_outline.png',
-			snd_hitclap: 'STYX_HELIX/soft-hitclap3.wav'
+			snd_hitclap: 'STYX_HELIX/soft-hitclap3.wav',
+
+			snd_drum_hitclap: 'defaultAssets/drum-hitclap.wav',
+			snd_drum_hitfinish: 'defaultAssets/drum-hitfinish.wav',
+			snd_drum_hitnormal: 'defaultAssets/drum-hitnormal.wav',
+			snd_drum_hitwhistle: 'defaultAssets/drum-hitwhistle.wav',
+			snd_drum_sliderslide: 'defaultAssets/drum-sliderslide.wav',
+			snd_drum_slidertick: 'defaultAssets/drum-slidertick.wav',
+			snd_drum_sliderwhistle: 'defaultAssets/drum-sliderwhistle.wav',
+
+			snd_normal_hitclap: 'defaultAssets/normal-hitclap.wav',
+			snd_normal_hitfinish: 'defaultAssets/normal-hitfinish.wav',
+			snd_normal_hitnormal: 'defaultAssets/normal-hitnormal.wav',
+			snd_normal_hitwhistle: 'defaultAssets/normal-hitwhistle.wav',
+			snd_normal_sliderslide: 'defaultAssets/normal-sliderslide.wav',
+			snd_normal_slidertick: 'defaultAssets/normal-slidertick.wav',
+			snd_normal_sliderwhistle: 'defaultAssets/normal-sliderwhistle.wav',
+
+			snd_soft_hitclap: 'defaultAssets/soft-hitclap.wav',
+			snd_soft_hitfinish: 'defaultAssets/soft-hitfinish.wav',
+			snd_soft_hitwhistle: 'defaultAssets/soft-hitwhistle.wav',
+			snd_soft_sliderslide: 'defaultAssets/soft-sliderslide.wav',
+			snd_soft_slidertick: 'defaultAssets/soft-slidertick.wav',
+			snd_soft_sliderwhistle: 'defaultAssets/soft-sliderwhistle.wav',
 		};
 
 		this.Leaderboards = {
