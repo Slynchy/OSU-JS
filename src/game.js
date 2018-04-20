@@ -180,7 +180,6 @@ class Game extends Token {
 				current.x,
 				current.y,
 				current.type,
-				'hitsound', // todo
 				{
 					fadein: this._fadein,
 					preempt: this._preempt,
@@ -202,15 +201,21 @@ class Game extends Token {
 				current.x,
 				current.y,
 				current.type,
-				'hitsound', // todo
 				{
 					fadein: this._fadein,
 					preempt: this._preempt,
-					circleSize: this._circleSize
+					circleSize: this._circleSize,
+					hitsound: this._getHitSound(current)
 				},
 				{ game: this }
 			)
 		);
+	}
+
+	_getHitSound(entry){
+		let file = ('snd_' + this._osuFile['General']['SampleSet'] + '_hit' + entry.hitsound).toLowerCase();
+
+		return global[file];
 	}
 
 	/**

@@ -3,7 +3,7 @@ let ContainerObject = require('../engine/ContainerObject.js');
 let GameObject = require('../engine/GameObject.js');
 
 class SliderHitObject extends ContainerObject {
-	constructor(x, y, type, hitsound, metadata, props) {
+	constructor(x, y, type, metadata, props) {
 		super({});
 
 		this.fadein = 0;
@@ -134,6 +134,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	_handlePointerOut(ev){
+		if (!this.isPointerDown()) return;
 		this._pointerDown = null;
 		this.expire();
 	}
