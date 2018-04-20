@@ -1,9 +1,8 @@
-let Token = require("../engine/Token.js");
+let Token = require('../engine/Token.js');
 let ContainerObject = require('../engine/ContainerObject.js');
 
 class LoadingScreen extends Token {
-
-	constructor(props){
+	constructor(props) {
 		super({});
 
 		this.scene = new ContainerObject();
@@ -32,10 +31,9 @@ class LoadingScreen extends Token {
 				Settings.applicationSettings.width * (PIXI.loader.progress * 0.01),
 				Settings.applicationSettings.height * 0.5
 			);
-
 	}
 
-	onRemove(){
+	onRemove() {
 		Application.stage.removeChild(this.scene);
 	}
 }

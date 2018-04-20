@@ -57,9 +57,8 @@ class CircleHitObject extends GameObject {
 	}
 
 	onClick() {
-
-		if(this.hitsound)
-			this.hitsound.play();
+		if (this.hitsound) this.hitsound.play();
+		snd_normal_hitnormal.sound.play();
 
 		let timeOffset = this.preempt * this._progressPreempt;
 		timeOffset = this.preempt - timeOffset;
@@ -77,8 +76,7 @@ class CircleHitObject extends GameObject {
 	}
 
 	endStep(dt) {
-
-		if(this._progressPreempt < 1){
+		if (this._progressPreempt < 1) {
 			if (this.alpha < 1) this.alpha += dt / this.fadein;
 			else this.alpha = 1;
 		} else {

@@ -90,7 +90,7 @@ class Game extends Token {
 		throw new Error('AR not a number!');
 	}
 
-	calculateScore(difficulty, timestamp){
+	calculateScore(difficulty, timestamp) {
 		return Game._calculateScore(difficulty, timestamp);
 	}
 
@@ -191,6 +191,9 @@ class Game extends Token {
 					preempt: this._preempt,
 					path: current.path,
 					circleSize: this._circleSize,
+					repeat: current.repeat,
+					mpb: this._activeMPB,
+					comboNumber: this.scene.children.length,
 					duration:
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
@@ -218,10 +221,20 @@ class Game extends Token {
 		);
 	}
 
-	_getHitSound(entry){
-		let file = ('snd_' + this._osuFile['General']['SampleSet'] + '_hit' + entry.hitsound).toLowerCase();
+	_getHitSound(entry) {
+		let file = (
+			'snd_' +
+			this._osuFile.data['General']['SampleSet'] +
+			'_hit' +
+			entry.hitsound
+		).toLowerCase();
 
-		return global[file];
+		console.log(file);
+
+		if(global.hasOwnProperty(file))
+			return global[file];
+		else
+			return null;
 	}
 
 	/**
