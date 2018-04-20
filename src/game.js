@@ -26,6 +26,8 @@ class Game extends Token {
 		this._activeMPB = 1000;
 		this.events = [];
 
+		PIXI.sound.volumeAll = 0.1;
+
 		this.bg = new GameObject(
 			//this.activeTrack.bg,
 			t_white,
