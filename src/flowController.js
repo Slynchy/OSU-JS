@@ -19,6 +19,12 @@ class FlowController {
 		return this._currentAction;
 	}
 
+	printCurrentAction(){
+		if(!this._currentAction) return;
+		console.log(this._currentAction.name);
+		return this._currentAction.name;
+	}
+
 	/**
 	 * @param {Function} val
 	 */
@@ -48,7 +54,7 @@ class FlowController {
 			}
 		);
 
-		AddToken(this.loadingScreen = new LoadingScreen());
+		AddToken((this.loadingScreen = new LoadingScreen()));
 		this.currentAction = this.waitForLoading;
 	}
 
