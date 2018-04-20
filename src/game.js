@@ -177,6 +177,10 @@ class Game extends Token {
 	}
 
 	_spawnSlider(current) {
+
+		//TODO: fix this hack
+		if(current.path.sliderType === 'bezier') return;
+
 		this.scene.addChild(
 			new SliderHitObject(
 				current.x,
