@@ -51,6 +51,10 @@ class Settings {
 			url: 'https://www.google-analytics.com/collect?' // deprecated
 		};
 
+		this.OSUSettings = {
+			timing_threshold: 0.066 // difference of 66ms
+		};
+
 		this.resources = {
 			t_black: 'black.png',
 			t_white: 'white.png',

@@ -7,6 +7,7 @@ let CircleHitObject = require('./Objects/CircleHitObject.js');
 let NineSliceObject = require('./engine/NineSliceObject.js');
 let SliderHitObject = require('./Objects/SliderHitObject.js');
 let WebAudioScheduler = require('web-audio-scheduler');
+let AudioLoader = require('audio-loader')
 
 class Game extends Token {
 	constructor(osuFile, props) {
@@ -55,9 +56,26 @@ class Game extends Token {
 
 		if (props) Object.assign(this, props);
 
-		this._scheduleHitObjectSpawns();
-		this._scheduleTimingPoints();
-		this._playTrack();
+		AudioLoader('./assets/STYX_HELIX/audio.mp3').then(
+			(buffer)=>{
+				console.log(buffer);
+
+				this.__AUDIOCTX = new AudioContext();
+				this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
+				this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
+				this.__AUDIOSRC.buffer = buffer;
+
+				this.__AUDIOSRC.connect(this.__AUDIOGAIN);
+				this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
+
+				this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
+				this._createScheduler();
+				this._scheduleHitObjectSpawns();
+				this._scheduleTimingPoints();
+				this._playTrack();
+			}
+		);
+
 	}
 
 	addScore(score) {
@@ -72,7 +90,8 @@ class Game extends Token {
 	_playTrack() {
 		this.__trackProgress = 0;
 		this._trackClock.start();
-		this.__trackInstance = this.activeTrack.track.play();
+		this.__trackInstance = this.__AUDIOSRC.start();
+		this.__AUDIOGAIN.gain.setValueAtTime(0.1, this.__AUDIOCTX.currentTime);
 		//this.__trackInstance.on('progress', this._onProgress.bind(this));
 	}
 
@@ -133,17 +152,30 @@ class Game extends Token {
 		//throw new Error('Invalid timestamp');
 	}
 
-	_scheduleHitObjectSpawns() {
-		if (!this._trackClock) {
-			this._trackClock = new WebAudioScheduler({ context: this.activeTrack.track.context.audioContext });
-		}
+	_createScheduler(){
+		this._trackClock = new WebAudioScheduler(
+			{
+				context: this.__AUDIOCTX,
+				interval: 0.0125,
+				aheadTime: 0.025
+			}
+		);
+	}
 
+	async _scheduleHitObjectSpawns() {
 		for (let k in this.activeTrack.data['HitObjects']) {
 			let current = this.activeTrack.data['HitObjects'][k];
 
+			let timestamp = (current.time * 0.001) - (this._preempt * 0.001);
+
 			this._trackClock.insert(
-				current.time * 0.001,
+				timestamp,
 				() => {
+					let diff = Math.abs((timestamp)-(this.__AUDIOCTX.currentTime));
+					if(diff >= Settings.OSUSettings.timing_threshold){
+						console.warn('Out of timing by %ims', diff * 1000);
+					}
+
 					switch (current.type.type) {
 						case 'slider':
 							this._spawnSlider(current);
@@ -158,12 +190,7 @@ class Game extends Token {
 		}
 	}
 
-	_scheduleTimingPoints() {
-		if (!this._trackClock) {
-			this._trackClock = new WebAudioScheduler({ context: this.activeTrack.track.context.audioContext });
-		}
-
-		this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
+	async _scheduleTimingPoints() {
 
 		for (let i = 1; i < this.activeTrack.data['TimingPoints'].length; i++) {
 			let current = this.activeTrack.data['TimingPoints'][i];
