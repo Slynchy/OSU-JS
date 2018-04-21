@@ -19,17 +19,17 @@ class SliderHitObject extends ContainerObject {
 		this.preempt = 0;
 		this.circleSize = 0;
 		this.repeat = 0;
-		this.mbp = 0;
+		this.mpb = 0;
 		this.comboNumber = 0;
 		Object.assign(this, metadata);
 
 		this.ticks = [];
-		this.numberOfTicks = Math.floor(this.duration / (this.mbp === 0 ? this.duration * 2 : this.mbp));
+		this.numberOfTicks = Math.floor(this.duration / (this.mpb === 0 ? this.duration * 2 : this.mpb));
 		if(this.numberOfTicks > 0){
 			for(let i = 0; i < this.numberOfTicks; i++){
 				this.ticks.push({
 					done: false,
-					timestamp: this.mbp * i+1
+					timestamp: this.mpb * i+1
 				});
 			}
 		}
