@@ -7,6 +7,25 @@ const PIXI = (global.PIXI = require('pixi.js'));
 const PIXISND = (global.PIXISND = require('pixi-sound'));
 
 require('./engine/MiscPolyfills.js');
+
+global.osuScale = function(x, y) {
+	if (typeof y === 'undefined') {
+		if (typeof x === 'object') {
+			return {
+				x: x.x * (Settings.applicationSettings.width / 512),
+				y: x.y * (Settings.applicationSettings.height / 384)
+			};
+		} else {
+			return x * (Settings.applicationSettings.width / 512);
+		}
+	} else {
+		return {
+			x: x * (Settings.applicationSettings.width / 512),
+			y: y * (Settings.applicationSettings.height / 384)
+		};
+	}
+};
+
 require('./engine/FBInstant.js');
 
 const Settings = (global.Settings = require('./Settings/Settings.js'));
@@ -25,12 +44,39 @@ Application.renderer.backgroundColor = Settings.applicationSettings.backgroundCo
 document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
 
-window.addEventListener('resize', function() {
-	Application.renderer.resize(
-		Settings.applicationSettings.width,
-		Settings.applicationSettings.height
+let resize = function(){
+	let scale = { x: 1, y: 1 };
+	scale.x = (window.innerWidth - 10) / Application.view.width;
+	scale.y = (window.innerHeight - 10) / Application.view.height;
+
+	if (scale.x < 1 || scale.y < 1) {
+		scale = '1, 1';
+	} else if (scale.x < scale.y) {
+		scale = scale.x + ', ' + scale.x;
+	} else {
+		scale = scale.y + ', ' + scale.y;
+	}
+
+	Application.view.setAttribute(
+		'style',
+		Application.view.getAttribute('style') +
+		' ' +
+		'-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top;' +
+		'-o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' +
+		scale +
+		'); -webkit-transform: scale3d(' +
+		scale +
+		', 1); -moz-transform: scale(' +
+		scale +
+		'); -o-transform: scale(' +
+		scale +
+		'); transform: scale(' +
+		scale +
+		');'
 	);
-});
+};
+window.addEventListener('resize', resize);
+resize();
 
 const flowController = (global.flowController = require('./flowController.js'));
 
