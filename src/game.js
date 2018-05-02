@@ -7,7 +7,7 @@ let CircleHitObject = require('./Objects/CircleHitObject.js');
 let NineSliceObject = require('./engine/NineSliceObject.js');
 let SliderHitObject = require('./Objects/SliderHitObject.js');
 let WebAudioScheduler = require('web-audio-scheduler');
-let AudioLoader = require('audio-loader')
+let AudioLoader = require('audio-loader');
 
 class Game extends Token {
 	constructor(osuFile, props) {
@@ -23,15 +23,18 @@ class Game extends Token {
 		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
 		this._fadein = Game._calculateFadein(this.activeTrack.data['Difficulty']);
 		this._preempt = Game._calculatePreempt(this.activeTrack.data['Difficulty']);
-		this._circleSize = 54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize'];
+		this._circleSize = osuScale(
+			54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize']
+		);
 		this._activeMPB = 1000;
 		this.events = [];
 
-		PIXI.sound.volumeAll = 0.1;
+		if(PIXI.sound)
+			PIXI.sound.volumeAll = 0.1;
 
 		this.bg = new GameObject(
 			//this.activeTrack.bg,
-			t_white,
+			t_black,
 			{
 				width: Settings.applicationSettings.width,
 				height: Settings.applicationSettings.height,
@@ -46,7 +49,7 @@ class Game extends Token {
 			x: Settings.applicationSettings.width / 2,
 			style: new PIXI.TextStyle({
 				align: 'center',
-				fontSize: 22,
+				fontSize: osuScale(22),
 				fill: '#ff0000'
 			})
 		});
@@ -56,26 +59,23 @@ class Game extends Token {
 
 		if (props) Object.assign(this, props);
 
-		AudioLoader('./assets/STYX_HELIX/audio.mp3').then(
-			(buffer)=>{
-				console.log(buffer);
+		AudioLoader('./assets/STYX_HELIX/audio.mp3').then(buffer => {
+			console.log(buffer);
 
-				this.__AUDIOCTX = new AudioContext();
-				this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
-				this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
-				this.__AUDIOSRC.buffer = buffer;
+			this.__AUDIOCTX = new AudioContext();
+			this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
+			this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
+			this.__AUDIOSRC.buffer = buffer;
 
-				this.__AUDIOSRC.connect(this.__AUDIOGAIN);
-				this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
+			this.__AUDIOSRC.connect(this.__AUDIOGAIN);
+			this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
 
-				this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
-				this._createScheduler();
-				this._scheduleHitObjectSpawns();
-				this._scheduleTimingPoints();
-				this._playTrack();
-			}
-		);
-
+			this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
+			this._createScheduler();
+			this._scheduleHitObjectSpawns();
+			this._scheduleTimingPoints();
+			this._playTrack();
+		});
 	}
 
 	addScore(score) {
@@ -152,66 +152,57 @@ class Game extends Token {
 		//throw new Error('Invalid timestamp');
 	}
 
-	_createScheduler(){
-		this._trackClock = new WebAudioScheduler(
-			{
-				context: this.__AUDIOCTX,
-				interval: 0.0125,
-				aheadTime: 0.025
-			}
-		);
+	_createScheduler() {
+		this._trackClock = new WebAudioScheduler({
+			context: this.__AUDIOCTX,
+			interval: 0.0125,
+			aheadTime: 0.025
+		});
 	}
 
 	async _scheduleHitObjectSpawns() {
 		for (let k in this.activeTrack.data['HitObjects']) {
 			let current = this.activeTrack.data['HitObjects'][k];
 
-			let timestamp = (current.time * 0.001) - (this._preempt * 0.001);
+			let timestamp = current.time * 0.001 - this._preempt * 0.001;
 
-			this._trackClock.insert(
-				timestamp,
-				() => {
-					let diff = Math.abs((timestamp)-(this.__AUDIOCTX.currentTime));
-					if(diff >= Settings.OSUSettings.timing_threshold){
-						console.warn('Out of timing by %ims', diff * 1000);
-					}
-
-					switch (current.type.type) {
-						case 'slider':
-							this._spawnSlider(current);
-							break;
-						default:
-						case 'circle':
-							this._spawnCircle(current);
-							break;
-					}
+			this._trackClock.insert(timestamp, () => {
+				let diff = Math.abs(timestamp - this.__AUDIOCTX.currentTime);
+				if (diff >= Settings.OSUSettings.timing_threshold) {
+					console.warn('Out of timing by %ims', diff * 1000);
 				}
-			);
+
+				switch (current.type.type) {
+					case 'slider':
+						this._spawnSlider(current);
+						break;
+					default:
+					case 'circle':
+						this._spawnCircle(current);
+						break;
+				}
+			});
 		}
 	}
 
 	async _scheduleTimingPoints() {
-
 		for (let i = 1; i < this.activeTrack.data['TimingPoints'].length; i++) {
 			let current = this.activeTrack.data['TimingPoints'][i];
 
-			this._trackClock.insert(
-				current.offset * 0.001,
-				this._setTimingPointData,
-				current
-			);
+			this._trackClock.insert(current.offset * 0.001, this._setTimingPointData, current);
 		}
 	}
 
 	_spawnSlider(current) {
-
 		//TODO: fix this hack
-		if(current.path.sliderType === 'bezier') return;
+		if (current.path.sliderType === 'bezier') return;
+
+		let pos = osuScale(current.x, current.y);
 
 		this.scene.addChild(
 			new SliderHitObject(
-				current.x,
-				current.y,
+				pos.x,
+				pos.y,
 				current.type,
 				{
 					fadein: this._fadein,
@@ -232,10 +223,11 @@ class Game extends Token {
 	}
 
 	_spawnCircle(current) {
+		let pos = osuScale(current.x, current.y);
 		this.scene.addChild(
 			new CircleHitObject(
-				current.x,
-				current.y,
+				pos.x,
+				pos.y,
 				current.type,
 				{
 					fadein: this._fadein,
@@ -258,67 +250,8 @@ class Game extends Token {
 
 		console.log(file);
 
-		if(global.hasOwnProperty(file))
-			return global[file];
-		else
-			return null;
-	}
-
-	/**
-	 *
-	 * @param time
-	 * @private
-	 * @deprecated
-	 */
-	_handleHitObjectProgress(time) {
-		for (let k in this.activeTrack.data['HitObjects']) {
-			let current = this.activeTrack.data['HitObjects'][k];
-
-			//if(current.type.type !== 'circle') continue;
-
-			if (Math.floor(time * 1000) > current.time - this._preempt && !current.spawned) {
-				console.log(current.type.type);
-
-				let obj = null;
-
-				switch (current.type.type) {
-					case 'slider':
-						obj = new SliderHitObject(
-							current.x,
-							current.y,
-							current.type,
-							'hitsound', // todo
-							{
-								fadein: this._fadein,
-								preempt: this._preempt,
-								path: current.path,
-								circleSize: this._circleSize
-							},
-							{ game: this }
-						);
-						break;
-					default:
-					case 'circle':
-						obj = new CircleHitObject(
-							current.x,
-							current.y,
-							current.type,
-							'hitsound', // todo
-							{
-								fadein: this._fadein,
-								preempt: this._preempt,
-								circleSize: this._circleSize
-							},
-							{ game: this }
-						);
-						break;
-				}
-
-				this.scene.addChild(obj);
-
-				current.spawned = true;
-			}
-		}
+		if (global.hasOwnProperty(file)) return global[file];
+		else return null;
 	}
 
 	_setTimingPointData(tpoint) {

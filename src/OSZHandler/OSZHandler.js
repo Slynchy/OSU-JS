@@ -24,7 +24,7 @@ class OSZHandler {
 				STYX_HELIX_BG: 'STYX_HELIX/BG.jpg'
 			})
 				.then(resources => {
-					result.track = null;//STYX_HELIX_MP3;
+					result.track = null; //STYX_HELIX_MP3;
 					result.bg = STYX_HELIX_BG;
 					result.data = osujson;
 					resolve(result);

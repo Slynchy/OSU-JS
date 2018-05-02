@@ -19,8 +19,8 @@ class FlowController {
 		return this._currentAction;
 	}
 
-	printCurrentAction(){
-		if(!this._currentAction) return;
+	printCurrentAction() {
+		if (!this._currentAction) return;
 		console.log(this._currentAction.name);
 		return this._currentAction.name;
 	}

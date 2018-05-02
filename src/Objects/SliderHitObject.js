@@ -4,12 +4,11 @@ let GameObject = require('../engine/GameObject.js');
 let Text = require('../engine/Text.js');
 
 class SliderHitObject extends ContainerObject {
-
-	static get Directions(){
+	static get Directions() {
 		return {
 			FORWARD: false,
 			BACKWARD: true
-		}
+		};
 	}
 
 	constructor(x, y, type, metadata, props) {
@@ -24,12 +23,14 @@ class SliderHitObject extends ContainerObject {
 		Object.assign(this, metadata);
 
 		this.ticks = [];
-		this.numberOfTicks = Math.floor(this.duration / (this.mpb === 0 ? this.duration * 2 : this.mpb));
-		if(this.numberOfTicks > 0){
-			for(let i = 0; i < this.numberOfTicks; i++){
+		this.numberOfTicks = Math.floor(
+			this.duration / (this.mpb === 0 ? this.duration * 2 : this.mpb)
+		);
+		if (this.numberOfTicks > 0) {
+			for (let i = 0; i < this.numberOfTicks; i++) {
 				this.ticks.push({
 					done: false,
-					timestamp: this.mpb * i+1
+					timestamp: this.mpb * i + 1
 				});
 			}
 		}
@@ -44,7 +45,7 @@ class SliderHitObject extends ContainerObject {
 		this.bg = new PIXI.Graphics();
 		this.addChild(this.bg);
 
-		this.target = new GameObject(t_circleOutline, {
+		this.target = new GameObject(t_whiteCircle, {
 			width: this.circleSize,
 			height: this.circleSize,
 			interactive: true
@@ -76,6 +77,8 @@ class SliderHitObject extends ContainerObject {
 		// this.bg.width += normalisedWidth;
 
 		if (this.path['end']) {
+			this.path['end'] = osuScale(this.path['end']);
+
 			// todo FIX THIS
 			this.bg
 				.lineStyle(5, 0xff0000)
@@ -89,9 +92,7 @@ class SliderHitObject extends ContainerObject {
 
 		this.outline = new GameObject(t_circleOutline, {
 			width: this.target.width,
-			height: this.target.height,
-			x: this.target.width / 2,
-			y: this.target.height / 2
+			height: this.target.height
 		});
 		this.outline.scale.x = 3;
 		this.outline.scale.y = 3;
@@ -118,15 +119,14 @@ class SliderHitObject extends ContainerObject {
 			this.alpha = 3 - 2 * this._progressPreempt;
 		}
 
-		if(!this._clicked){
+		if (!this._clicked) {
 			this._progressPreempt += dt / this.preempt;
 			this.outline.scale.x = this.outline.scale.y = 3 - 2 * this._progressPreempt;
 
-			if(this.outline.scale.x <= 0){
+			if (this.outline.scale.x <= 0) {
 				this.expire();
 				return;
 			}
-
 		} else {
 			this.outline.alpha = 0;
 		}
@@ -136,7 +136,7 @@ class SliderHitObject extends ContainerObject {
 
 			if (this.target._progress >= 1) {
 				this._repeatCounter++;
-				if(this._repeatCounter >= this.repeat){
+				if (this._repeatCounter >= this.repeat) {
 					this.score();
 					return;
 				} else {
@@ -144,30 +144,27 @@ class SliderHitObject extends ContainerObject {
 				}
 			}
 
-			if(this.direction === SliderHitObject.Directions.FORWARD){
-
+			if (this.direction === SliderHitObject.Directions.FORWARD) {
 				this.target.x = lerp(0, this.path['end'].x - this.x, this.target._progress);
 				this.target.y = lerp(0, this.path['end'].y - this.y, this.target._progress);
-
-			} else if(this.direction === SliderHitObject.Directions.BACKWARD){
-
+			} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
 				this.target.x = lerp(this.path['end'].x - this.x, 0, this.target._progress);
 				this.target.y = lerp(this.path['end'].y - this.y, 0, this.target._progress);
-
 			}
 
-			for(let i = 0; i < this.numberOfTicks; i++){
-				if(this.target._progress * this.duration > this.ticks[i].timestamp && this.ticks[i].done === false){
+			for (let i = 0; i < this.numberOfTicks; i++) {
+				if (
+					this.target._progress * this.duration > this.ticks[i].timestamp &&
+					this.ticks[i].done === false
+				) {
 					this.ticks[i].done = true;
 					snd_soft_slidertick.sound.play();
 				}
 			}
 		}
-
-
 	}
 
-	reverseDirection(){
+	reverseDirection() {
 		snd_normal_hitnormal.sound.play();
 		this.direction = !this.direction;
 		this.target._progress = 0;
