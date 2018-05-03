@@ -61,6 +61,13 @@ class SliderHitObject extends ContainerObject {
 		this.target._progress = 0;
 		this.addChild(this.target);
 
+		this.glow = new GameObject(t_circle_glow, {});
+		this.target.addChild(this.glow);
+		this.glow.width *= 0.9;
+		this.glow.height *= 0.9;
+		this.glow.x = -(this.glow.width / 2);
+		this.glow.y = -(this.glow.height / 2);
+
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
 			style: new PIXI.TextStyle({

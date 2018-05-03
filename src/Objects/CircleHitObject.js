@@ -11,7 +11,7 @@ class CircleHitObject extends GameObject {
 	 * @param {Object} [props]
 	 */
 	constructor(x, y, type, metadata, props) {
-		super(t_circleOutline);
+		super(t_whiteCircle);
 
 		this.fadein = 0;
 		this.preempt = 0;
@@ -42,6 +42,13 @@ class CircleHitObject extends GameObject {
 		// this.hitRadius.anchor.x = this.hitRadius.anchor.y = 0.5;
 		// this.hitRadius.alpha = 0.5;
 		// this.addChild(this.hitRadius);
+
+		this.glow = new GameObject(t_circle_glow, {});
+		this.addChild(this.glow);
+		this.glow.width *= 0.9;
+		this.glow.height *= 0.9;
+		this.glow.x = -(this.glow.width / 2);
+		this.glow.y = -(this.glow.height / 2);
 
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
