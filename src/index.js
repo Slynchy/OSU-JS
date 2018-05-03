@@ -62,8 +62,7 @@ let resize = function() {
 		'style',
 		__CACHEDCSSSTYLE +
 			' ' +
-			'-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top;' +
-			'-o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' +
+		'-ms-transform: scale(' +
 			scale +
 			'); -webkit-transform: scale3d(' +
 			scale +
@@ -73,7 +72,7 @@ let resize = function() {
 			scale +
 			'); transform: scale(' +
 			scale +
-			');'
+			'); max-width: 100%;max-height: 100%;'
 	);
 };
 window.addEventListener('resize', resize);
