@@ -145,7 +145,7 @@ class SliderHitObject extends ContainerObject {
 			this.target._progress += dt / this.duration;
 
 			if (this.target._progress >= 1) {
-				if (this._repeatCounter+1 >= this.repeat) {
+				if (this._repeatCounter + 1 >= this.repeat) {
 					this.score();
 					return;
 				} else {
@@ -172,7 +172,7 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
-	onDestroy(){
+	onDestroy() {
 		this._stopTickerSFX();
 	}
 
@@ -190,7 +190,7 @@ class SliderHitObject extends ContainerObject {
 			throw new Error('No game reference on object!');
 		}
 
-		this._playHitSFX(this._repeatCounter+1);
+		this._playHitSFX(this._repeatCounter + 1);
 
 		this.destroy();
 	}
@@ -222,37 +222,37 @@ class SliderHitObject extends ContainerObject {
 		if (!this.isPointerDown()) return;
 		this._pointerDown = null;
 
-		if(this.target._progress >= Settings.OSUSettings.slider_reward_threshold){
+		if (this.target._progress >= Settings.OSUSettings.slider_reward_threshold) {
 			this.score();
 		} else {
 			this.expire();
 		}
 	}
 
-	_playHitSFX(counter){
-		for(let i = 0; i < this.edgeSounds[counter].length; i++){
+	_playHitSFX(counter) {
+		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].sound.play();
 		}
 	}
 
-	_playTickerSFX(){
-		if(!Array.isArray(this.tickerSound)){
+	_playTickerSFX() {
+		if (!Array.isArray(this.tickerSound)) {
 			let temp = this.tickerSound;
 			this.tickerSound = [temp];
 		}
 
 		console.log(this.tickerSound);
 
-		for(let i = 0; i < this.tickerSound.length; i++){
+		for (let i = 0; i < this.tickerSound.length; i++) {
 			this.tickerSound[i].sound.loop = true;
 			this.tickerSound[i].sound.play();
 		}
 	}
 
-	_stopTickerSFX(){
-		for(let i = 0; i < this.tickerSound.length; i++){
+	_stopTickerSFX() {
+		for (let i = 0; i < this.tickerSound.length; i++) {
 			//if(this.tickerSound[i].sound.isPlaying){
-				this.tickerSound[i].sound.stop();
+			this.tickerSound[i].sound.stop();
 			//}
 		}
 	}
