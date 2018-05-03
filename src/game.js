@@ -60,7 +60,9 @@ class Game extends Token {
 
 		if (props) Object.assign(this, props);
 
-		AudioLoader('./assets/STYX_HELIX/audio.mp3').then(buffer => {
+		AudioLoader(
+			'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
+		).then(buffer => {
 			console.log(buffer);
 
 			this.__AUDIOCTX = new AudioContext();
