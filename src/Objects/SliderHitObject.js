@@ -19,7 +19,8 @@ class SliderHitObject extends ContainerObject {
 		this.circleSize = 0;
 		this.repeat = 0;
 		this.mpb = 0;
-		this.hitSounds = null;
+		this.edgeSounds = [];
+		this.tickerSound = null;
 		this.comboNumber = 0;
 		Object.assign(this, metadata);
 
@@ -144,8 +145,7 @@ class SliderHitObject extends ContainerObject {
 			this.target._progress += dt / this.duration;
 
 			if (this.target._progress >= 1) {
-				this._repeatCounter++;
-				if (this._repeatCounter >= this.repeat) {
+				if (this._repeatCounter+1 >= this.repeat) {
 					this.score();
 					return;
 				} else {
@@ -172,9 +172,14 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
+	onDestroy(){
+		this._stopTickerSFX();
+	}
+
 	reverseDirection() {
 		this.direction = !this.direction;
 		this.target._progress = 0;
+		this._playHitSFX(++this._repeatCounter);
 	}
 
 	score(timeOffset) {
@@ -184,6 +189,8 @@ class SliderHitObject extends ContainerObject {
 		} else {
 			throw new Error('No game reference on object!');
 		}
+
+		this._playHitSFX(this._repeatCounter+1);
 
 		this.destroy();
 	}
@@ -204,22 +211,50 @@ class SliderHitObject extends ContainerObject {
 			y: ev.data.global.y
 		};
 
-		this._playHitSFX();
+		console.log(this.tickerSound);
+		this._playHitSFX(this._repeatCounter);
+		this._playTickerSFX();
 
 		this._clicked = true;
-	}
-
-	_playHitSFX() {
-		console.log(this.hitSounds);
-		for (let i = 0; i < this.hitSounds.length; i++) {
-			this.hitSounds[i].sound.play();
-		}
 	}
 
 	_handlePointerUp(ev) {
 		if (!this.isPointerDown()) return;
 		this._pointerDown = null;
-		this.expire();
+
+		if(this.target._progress >= Settings.OSUSettings.slider_reward_threshold){
+			this.score();
+		} else {
+			this.expire();
+		}
+	}
+
+	_playHitSFX(counter){
+		for(let i = 0; i < this.edgeSounds[counter].length; i++){
+			this.edgeSounds[counter][i].sound.play();
+		}
+	}
+
+	_playTickerSFX(){
+		if(!Array.isArray(this.tickerSound)){
+			let temp = this.tickerSound;
+			this.tickerSound = [temp];
+		}
+
+		console.log(this.tickerSound);
+
+		for(let i = 0; i < this.tickerSound.length; i++){
+			this.tickerSound[i].sound.loop = true;
+			this.tickerSound[i].sound.play();
+		}
+	}
+
+	_stopTickerSFX(){
+		for(let i = 0; i < this.tickerSound.length; i++){
+			//if(this.tickerSound[i].sound.isPlaying){
+				this.tickerSound[i].sound.stop();
+			//}
+		}
 	}
 
 	_handlePointerMove(ev) {

@@ -220,7 +220,8 @@ class Game extends Token {
 					repeat: current.repeat,
 					mpb: this._activeMPB,
 					comboNumber: ++this._currentComboCount,
-					hitSounds: this._getHitSound({ hitSound: 'normal' }),
+					tickerSound: this._getTickerSound(current),
+					edgeSounds: this._getEdgeHitSounds(current),
 					duration:
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
@@ -264,6 +265,45 @@ class Game extends Token {
 					result.push(global[file]);
 				} else {
 					throw new Error('Hitsound invalid!');
+				}
+			}
+		}
+
+		return result;
+	}
+
+	_getTickerSound(entry) {
+		let result = [];
+
+		for (let k in entry['hitSound']) {
+			if (entry['hitSound'][k] === true) {
+				let file = ('snd_' + this._activeSampleSet + '_slider' + k).toLowerCase();
+
+				if (global.hasOwnProperty(file)) {
+					result.push(global[file]);
+				} else {
+					throw new Error('Hitsound invalid!');
+				}
+			}
+		}
+
+		return result;
+	}
+
+	_getEdgeHitSounds(entry) {
+		let result = [];
+
+		for (let i in entry['edgeHitsounds']) {
+			result[i] = [];
+			for (let k in entry['edgeHitsounds'][i]) {
+				if (entry['edgeHitsounds'][i][k] === true || k === 'normal') {
+					let file = ('snd_' + this._activeSampleSet + '_hit' + k).toLowerCase();
+
+					if (global.hasOwnProperty(file)) {
+						result[i].push(global[file]);
+					} else {
+						throw new Error('Hitsound invalid!');
+					}
 				}
 			}
 		}

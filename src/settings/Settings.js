@@ -52,7 +52,9 @@ class Settings {
 		};
 
 		this.OSUSettings = {
-			timing_threshold: 0.066 // difference of 66ms
+			timing_threshold: 0.066, // difference of 66ms
+
+			slider_reward_threshold: 0.97 // if slider progress exceeds this value when mouse released, award points
 		};
 
 		this.resources = {
