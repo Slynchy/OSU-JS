@@ -27,6 +27,7 @@ class Game extends Token {
 			54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize']
 		);
 		this._activeMPB = 1000;
+		this._activeSampleSet = 'normal';
 		this.events = [];
 
 		if(PIXI.sound)
@@ -212,6 +213,7 @@ class Game extends Token {
 					repeat: current.repeat,
 					mpb: this._activeMPB,
 					comboNumber: this.scene.children.length,
+					hitSounds: this._getHitSound({ hitSound: 'normal' }),
 					duration:
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
@@ -233,7 +235,7 @@ class Game extends Token {
 					fadein: this._fadein,
 					preempt: this._preempt,
 					circleSize: this._circleSize,
-					hitsound: this._getHitSound(current)
+					hitSounds: this._getHitSound(current)
 				},
 				{ game: this }
 			)
@@ -241,22 +243,27 @@ class Game extends Token {
 	}
 
 	_getHitSound(entry) {
-		let file = (
-			'snd_' +
-			this._osuFile.data['General']['SampleSet'] +
-			'_hit' +
-			entry.hitsound
-		).toLowerCase();
+		let result = [];
 
-		console.log(file);
+		for (let k in entry['hitSound']) {
+			if (entry['hitSound'][k] === true || k === 'normal') {
+				let file = ('snd_' + this._activeSampleSet + '_hit' + k).toLowerCase();
 
-		if (global.hasOwnProperty(file)) return global[file];
-		else return null;
+				if (global.hasOwnProperty(file)) {
+					result.push(global[file]);
+				} else {
+					throw new Error('Hitsound invalid!');
+				}
+			}
+		}
+
+		return result;
 	}
 
 	_setTimingPointData(tpoint) {
 		this._activeMPB = tpoint.mpb;
 		this._activeMeter = tpoint.meter;
+		this._activeSampleSet = tpoint.sampleSet;
 
 		// todo
 

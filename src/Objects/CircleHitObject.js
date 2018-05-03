@@ -15,7 +15,7 @@ class CircleHitObject extends GameObject {
 		this.fadein = 0;
 		this.preempt = 0;
 		this.circleSize = 0;
-		this.hitsound = null;
+		this.hitSounds = null;
 		Object.assign(this, metadata);
 
 		this.interactive = true;
@@ -56,9 +56,15 @@ class CircleHitObject extends GameObject {
 		}
 	}
 
+	_playSFX() {
+		console.log(this.hitSounds);
+		for (let i = 0; i < this.hitSounds.length; i++) {
+			this.hitSounds[i].sound.play();
+		}
+	}
+
 	onClick() {
-		if (this.hitsound) this.hitsound.play();
-		snd_normal_hitnormal.sound.play();
+		this._playSFX();
 
 		let timeOffset = this.preempt * this._progressPreempt;
 		timeOffset = this.preempt - timeOffset;

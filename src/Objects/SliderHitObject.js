@@ -19,6 +19,7 @@ class SliderHitObject extends ContainerObject {
 		this.circleSize = 0;
 		this.repeat = 0;
 		this.mpb = 0;
+		this.hitSounds = null;
 		this.comboNumber = 0;
 		Object.assign(this, metadata);
 
@@ -158,21 +159,17 @@ class SliderHitObject extends ContainerObject {
 					this.ticks[i].done === false
 				) {
 					this.ticks[i].done = true;
-					snd_soft_slidertick.sound.play();
 				}
 			}
 		}
 	}
 
 	reverseDirection() {
-		snd_normal_hitnormal.sound.play();
 		this.direction = !this.direction;
 		this.target._progress = 0;
 	}
 
 	score(timeOffset) {
-		snd_normal_hitnormal.sound.play();
-
 		if (this.game) {
 			//this.game.addScore(this.game._calculateScore(this.game.overallDifficulty, timeOffset));
 			this.game.addScore(50);
@@ -199,9 +196,16 @@ class SliderHitObject extends ContainerObject {
 			y: ev.data.global.y
 		};
 
-		this._clicked = true;
+		this._playHitSFX();
 
-		snd_normal_hitnormal.sound.play();
+		this._clicked = true;
+	}
+
+	_playHitSFX() {
+		console.log(this.hitSounds);
+		for (let i = 0; i < this.hitSounds.length; i++) {
+			this.hitSounds[i].sound.play();
+		}
 	}
 
 	_handlePointerUp(ev) {

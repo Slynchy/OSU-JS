@@ -81,10 +81,11 @@ class Settings {
 
 			snd_soft_hitclap: 'defaultAssets/soft-hitclap.wav',
 			snd_soft_hitfinish: 'defaultAssets/soft-hitfinish.wav',
+			snd_soft_hitnormal: 'defaultAssets/soft-hitnormal.wav',
 			snd_soft_hitwhistle: 'defaultAssets/soft-hitwhistle.wav',
 			snd_soft_sliderslide: 'defaultAssets/soft-sliderslide.wav',
 			snd_soft_slidertick: 'defaultAssets/soft-slidertick.wav',
-			snd_soft_sliderwhistle: 'defaultAssets/soft-sliderwhistle.wav'
+			snd_soft_sliderwhistle: 'defaultAssets/soft-sliderwhistle.wav',
 		};
 
 		this.Leaderboards = {
