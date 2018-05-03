@@ -46,6 +46,28 @@ class SliderHitObject extends ContainerObject {
 
 		this.bg = new PIXI.Graphics();
 		this.addChild(this.bg);
+		if (this.path['end']) {
+			this.path['end'] = osuScale(this.path['end']);
+
+			// todo FIX THIS
+			this.bg
+				.lineStyle(5, 0xff0000)
+				.moveTo(0, 0)
+				.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
+		}
+
+		if(this.repeat > 1){
+			this.currentArrow = new GameObject(t_arrows, {
+				x:this.path['end'].x - this.x,
+				y:this.path['end'].y - this.y,
+				_sliderPos: 'end',
+				rotation: (Math.atan2(this.path['end'].y- this.y, this.path['end'].x - this.x)) - Math.PI
+			});
+			this.currentArrow.anchor.y = 0.5;
+			this.currentArrow.scale.x = osuScale(0.2,0.2).x;
+			this.currentArrow.scale.y = osuScale(0.2,0.2).y;
+			this.addChild(this.currentArrow);
+		}
 
 		this.target = new GameObject(t_whiteCircle, {
 			width: this.circleSize,
@@ -78,23 +100,7 @@ class SliderHitObject extends ContainerObject {
 		});
 		this.addChild(this.comboText);
 
-		//this.rotation = Math.atan2(metadata.path['end'].y - y, metadata.path['end'].x - x);
-
 		this.direction = SliderHitObject.Directions.FORWARD;
-
-		// let normalisedWidth = metadata.path['end'].x - x;
-		// if (normalisedWidth < 0) normalisedWidth *= -1;
-		// this.bg.width += normalisedWidth;
-
-		if (this.path['end']) {
-			this.path['end'] = osuScale(this.path['end']);
-
-			// todo FIX THIS
-			this.bg
-				.lineStyle(5, 0xff0000)
-				.moveTo(0, 0)
-				.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
-		}
 
 		this.alpha = 0;
 		this._progressFadeIn = 0;
@@ -180,6 +186,11 @@ class SliderHitObject extends ContainerObject {
 		this.direction = !this.direction;
 		this.target._progress = 0;
 		this._playHitSFX(++this._repeatCounter);
+		this._reverseArrow();
+	}
+
+	_reverseArrow(){
+		this.currentArrow._sli
 	}
 
 	score(timeOffset) {
@@ -211,7 +222,9 @@ class SliderHitObject extends ContainerObject {
 			y: ev.data.global.y
 		};
 
-		console.log(this.tickerSound);
+		if(this.tickerSound.length > 0)
+			console.log(this.tickerSound);
+
 		this._playHitSFX(this._repeatCounter);
 		this._playTickerSFX();
 

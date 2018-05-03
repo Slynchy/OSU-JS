@@ -89,7 +89,8 @@ class Settings {
 			snd_soft_slidertick: 'defaultAssets/soft-slidertick.wav',
 			snd_soft_sliderwhistle: 'defaultAssets/soft-sliderwhistle.wav',
 
-			t_circle_glow: 'circle_glow.png'
+			t_circle_glow: 'circle_glow.png',
+			t_arrows: 'arrows.png'
 		};
 
 		this.Leaderboards = {

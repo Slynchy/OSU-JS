@@ -75,7 +75,6 @@ class CircleHitObject extends GameObject {
 	}
 
 	_playSFX() {
-		console.log(this.hitSounds);
 		for (let i = 0; i < this.hitSounds.length; i++) {
 			this.hitSounds[i].sound.play();
 		}
