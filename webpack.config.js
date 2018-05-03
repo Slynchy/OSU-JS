@@ -11,7 +11,7 @@ const isProduction = nodeEnv === 'production';
 
 const plugins = [
     new HtmlWebpackPlugin({
-        title: 'Osu!JS'
+        template: './src/index.html'
     })
 ];
 

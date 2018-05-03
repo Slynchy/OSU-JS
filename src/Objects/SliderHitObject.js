@@ -56,16 +56,17 @@ class SliderHitObject extends ContainerObject {
 				.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
 		}
 
-		if(this.repeat > 1){
+		if (this.repeat > 1) {
 			this.currentArrow = new GameObject(t_arrows, {
-				x:this.path['end'].x - this.x,
-				y:this.path['end'].y - this.y,
+				x: this.path['end'].x - this.x,
+				y: this.path['end'].y - this.y,
 				_sliderPos: 'end',
-				rotation: (Math.atan2(this.path['end'].y- this.y, this.path['end'].x - this.x)) - Math.PI
+				rotation:
+					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
 			});
 			this.currentArrow.anchor.y = 0.5;
-			this.currentArrow.scale.x = osuScale(0.2,0.2).x;
-			this.currentArrow.scale.y = osuScale(0.2,0.2).y;
+			this.currentArrow.scale.x = osuScale(0.2, 0.2).x;
+			this.currentArrow.scale.y = osuScale(0.2, 0.2).y;
 			this.addChild(this.currentArrow);
 		}
 
@@ -83,6 +84,69 @@ class SliderHitObject extends ContainerObject {
 		this.target.anchor.x = 0.5;
 		this.target._progress = 0;
 		this.addChild(this.target);
+
+		this.emitterContainer = new PIXI.particles.ParticleContainer();
+		this.emitterContainer.setProperties({
+			scale: true,
+			position: true,
+			rotation: true,
+			uvs: true,
+			alpha: true
+		});
+		this.particleEmitter = new __PIXIPARTICLES.Emitter(this.emitterContainer, t_spark, {
+			"alpha": {
+				"start": 1,
+				"end": 0
+			},
+			"scale": {
+				"start": 0.5,
+				"end": 0.3,
+				"minimumScaleMultiplier": 1
+			},
+			"color": {
+				"start": "#e4f9ff",
+				"end": "#3fcbff"
+			},
+			"speed": {
+				"start": 50,
+				"end": 50,
+				"minimumSpeedMultiplier": 1
+			},
+			"acceleration": {
+				"x": 0,
+				"y": 0
+			},
+			"maxSpeed": 0,
+			"startRotation": {
+				"min": 0,
+				"max": 360
+			},
+			"noRotation": false,
+			"rotationSpeed": {
+				"min": 0,
+				"max": 0
+			},
+			"lifetime": {
+				"min": 0.2,
+				"max": 0.7
+			},
+			"blendMode": "normal",
+			"frequency": 0.001,
+			"emitterLifetime": -1,
+			"maxParticles": 500,
+			"pos": {
+				"x": 0,
+				"y": 0
+			},
+			"addAtBack": false,
+			"spawnType": "circle",
+			"spawnCircle": {
+				"x": 0,
+				"y": 0,
+				"r": 0
+			}
+		});
+		this.addChild(this.emitterContainer);
 
 		this.glow = new GameObject(t_circle_glow, {});
 		this.target.addChild(this.glow);
@@ -127,6 +191,11 @@ class SliderHitObject extends ContainerObject {
 	endStep(dt) {
 		this.comboText.x = this.target.x - 7;
 		this.comboText.y = this.target.y - 15;
+
+		if (this.particleEmitter && this._clicked) {
+			this.particleEmitter.updateSpawnPos(this.target.x, this.target.y);
+			this.particleEmitter.update(dt * 0.001);
+		}
 
 		if (this._progressPreempt < 1) {
 			if (this.alpha < 1) this.alpha += dt / this.fadein;
@@ -186,11 +255,34 @@ class SliderHitObject extends ContainerObject {
 		this.direction = !this.direction;
 		this.target._progress = 0;
 		this._playHitSFX(++this._repeatCounter);
-		this._reverseArrow();
+
+		if (this._repeatCounter + 1 < this.repeat) {
+			this._reverseArrow();
+		} else {
+			this.currentArrow.alpha = 0;
+		}
 	}
 
-	_reverseArrow(){
-		this.currentArrow._sli
+	_reverseArrow() {
+		if (this.currentArrow._sliderPos === 'start') {
+			this.currentArrow._sliderPos = 'end';
+		} else {
+			this.currentArrow._sliderPos = 'start';
+		}
+		//  x: this.path['end'].x - this.x,
+		// 	y: this.path['end'].y - this.y,
+		// 	_sliderPos: 'end',
+		// 	rotation:
+		//  Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+
+		this.currentArrow.x =
+			this.currentArrow._sliderPos === 'start' ? 0 : this.path['end'].x - this.x;
+		this.currentArrow.y =
+			this.currentArrow._sliderPos === 'start' ? 0 : this.path['end'].y - this.y;
+		this.currentArrow.rotation =
+			this.currentArrow._sliderPos === 'start'
+				? Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x)
+				: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
 	}
 
 	score(timeOffset) {
@@ -242,6 +334,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	_playHitSFX(counter) {
+		if(!this.edgeSounds[counter]) return;
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].sound.play();
 		}

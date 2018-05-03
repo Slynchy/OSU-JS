@@ -90,7 +90,8 @@ class Settings {
 			snd_soft_sliderwhistle: 'defaultAssets/soft-sliderwhistle.wav',
 
 			t_circle_glow: 'circle_glow.png',
-			t_arrows: 'arrows.png'
+			t_arrows: 'arrows.png',
+			t_spark: 'spark.png'
 		};
 
 		this.Leaderboards = {
