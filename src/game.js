@@ -30,8 +30,9 @@ class Game extends Token {
 		this._activeSampleSet = 'normal';
 		this.events = [];
 
-		if(PIXI.sound)
-			PIXI.sound.volumeAll = 0.1;
+		this._currentComboCount = 0;
+
+		if (PIXI.sound) PIXI.sound.volumeAll = 0.1;
 
 		this.bg = new GameObject(
 			//this.activeTrack.bg,
@@ -99,7 +100,7 @@ class Game extends Token {
 	}
 
 	static _calculatePreempt(difficulty) {
-		let AR = difficulty['ApproachRate'];
+		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
 			return 1200 + 600 * (5 - AR) / 5;
@@ -117,7 +118,7 @@ class Game extends Token {
 	}
 
 	static _calculateFadein(difficulty) {
-		let AR = difficulty['ApproachRate'];
+		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
 			return 800 + 400 * (5 - AR) / 5;
@@ -202,6 +203,10 @@ class Game extends Token {
 
 		let pos = osuScale(current.x, current.y);
 
+		if (current.type.isNewCombo) {
+			this._currentComboCount = 0;
+		}
+
 		this.scene.addChild(
 			new SliderHitObject(
 				pos.x,
@@ -214,7 +219,7 @@ class Game extends Token {
 					circleSize: this._circleSize,
 					repeat: current.repeat,
 					mpb: this._activeMPB,
-					comboNumber: this.scene.children.length,
+					comboNumber: ++this._currentComboCount,
 					hitSounds: this._getHitSound({ hitSound: 'normal' }),
 					duration:
 						current.pixelLength /
@@ -228,6 +233,9 @@ class Game extends Token {
 
 	_spawnCircle(current) {
 		let pos = osuScale(current.x, current.y);
+		if (current.type.isNewCombo) {
+			this._currentComboCount = 0;
+		}
 		this.scene.addChild(
 			new CircleHitObject(
 				pos.x,
@@ -236,6 +244,7 @@ class Game extends Token {
 				{
 					fadein: this._fadein,
 					preempt: this._preempt,
+					comboNumber: ++this._currentComboCount,
 					circleSize: this._circleSize,
 					hitSounds: this._getHitSound(current)
 				},

@@ -1,4 +1,5 @@
 let GameObject = require('../engine/GameObject.js');
+let Text = require('../engine/Text.js');
 
 class CircleHitObject extends GameObject {
 	/**
@@ -15,6 +16,7 @@ class CircleHitObject extends GameObject {
 		this.fadein = 0;
 		this.preempt = 0;
 		this.circleSize = 0;
+		this.comboNumber = 0;
 		this.hitSounds = null;
 		Object.assign(this, metadata);
 
@@ -40,6 +42,15 @@ class CircleHitObject extends GameObject {
 		// this.hitRadius.anchor.x = this.hitRadius.anchor.y = 0.5;
 		// this.hitRadius.alpha = 0.5;
 		// this.addChild(this.hitRadius);
+
+		this.comboText = new Text({
+			text: this.comboNumber.toString(),
+			style: new PIXI.TextStyle({
+				align: 'center',
+				fontSize: osuScale(54)
+			})
+		});
+		this.addChild(this.comboText);
 
 		this.outline = new GameObject(t_circleOutline, {
 			width: this.width,

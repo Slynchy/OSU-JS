@@ -99,6 +99,10 @@ class Settings {
 			musicVolume: 1.0 // unused
 		};
 
+		this.osuDefaults = {
+			ApproachRate: 3
+		};
+
 		this.flowSettings = {
 			mainMenuToken: null,
 			gameToken: game

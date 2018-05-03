@@ -64,7 +64,8 @@ class SliderHitObject extends ContainerObject {
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
 			style: new PIXI.TextStyle({
-				align: 'center'
+				align: 'center',
+				fontSize: osuScale(18)
 			})
 		});
 		this.addChild(this.comboText);
