@@ -43,8 +43,9 @@ const Application = (global.Application = new PIXI.Application(Settings.applicat
 Application.renderer.backgroundColor = Settings.applicationSettings.backgroundColor;
 document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
+global.__CACHEDCSSSTYLE = Application.view.getAttribute('style');
 
-let resize = function(){
+let resize = function() {
 	let scale = { x: 1, y: 1 };
 	scale.x = (window.innerWidth - 10) / Application.view.width;
 	scale.y = (window.innerHeight - 10) / Application.view.height;
@@ -59,20 +60,20 @@ let resize = function(){
 
 	Application.view.setAttribute(
 		'style',
-		Application.view.getAttribute('style') +
-		' ' +
-		'-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top;' +
-		'-o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' +
-		scale +
-		'); -webkit-transform: scale3d(' +
-		scale +
-		', 1); -moz-transform: scale(' +
-		scale +
-		'); -o-transform: scale(' +
-		scale +
-		'); transform: scale(' +
-		scale +
-		');'
+		__CACHEDCSSSTYLE +
+			' ' +
+			'-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top;' +
+			'-o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' +
+			scale +
+			'); -webkit-transform: scale3d(' +
+			scale +
+			', 1); -moz-transform: scale(' +
+			scale +
+			'); -o-transform: scale(' +
+			scale +
+			'); transform: scale(' +
+			scale +
+			');'
 	);
 };
 window.addEventListener('resize', resize);
