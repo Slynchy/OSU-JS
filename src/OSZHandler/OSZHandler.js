@@ -17,7 +17,7 @@ class OSZHandler {
 			// assume there's a video for now
 			let result = {};
 
-			result.videoTexture = PIXI.Texture.fromVideoUrl('assets/STYX_HELIX/VIDEO.flv');
+			//result.videoTexture = PIXI.Texture.fromVideoUrl('assets/STYX_HELIX/VIDEO.flv');
 
 			AssetLoader.LoadAssetsFromAssetList({
 				//STYX_HELIX_MP3: 'STYX_HELIX/' + osujson['General']['AudioFilename'],

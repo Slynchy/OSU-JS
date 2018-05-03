@@ -64,8 +64,6 @@ class Game extends Token {
 		AudioLoader(
 			'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
 		).then(buffer => {
-			console.log(buffer);
-
 			this.__AUDIOCTX = new AudioContext();
 			this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
 			this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();

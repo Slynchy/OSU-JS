@@ -222,8 +222,7 @@ class SliderHitObject extends ContainerObject {
 			y: ev.data.global.y
 		};
 
-		if(this.tickerSound.length > 0)
-			console.log(this.tickerSound);
+		if (this.tickerSound.length > 0) console.log(this.tickerSound);
 
 		this._playHitSFX(this._repeatCounter);
 		this._playTickerSFX();
@@ -253,8 +252,6 @@ class SliderHitObject extends ContainerObject {
 			let temp = this.tickerSound;
 			this.tickerSound = [temp];
 		}
-
-		console.log(this.tickerSound);
 
 		for (let i = 0; i < this.tickerSound.length; i++) {
 			this.tickerSound[i].sound.loop = true;
