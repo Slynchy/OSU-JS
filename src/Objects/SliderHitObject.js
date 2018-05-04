@@ -2,6 +2,7 @@ let NineSliceObject = require('../engine/NineSliceObject.js');
 let ContainerObject = require('../engine/ContainerObject.js');
 let GameObject = require('../engine/GameObject.js');
 let Text = require('../engine/Text.js');
+let CircularArcApproximator = require('../CircularArcApproximator.js');
 
 class SliderHitObject extends ContainerObject {
 	static get Directions() {
@@ -14,6 +15,9 @@ class SliderHitObject extends ContainerObject {
 	constructor(x, y, type, metadata, props) {
 		super({});
 
+		this.x = x;
+		this.y = y;
+
 		this.fadein = 0;
 		this.preempt = 0;
 		this.circleSize = 0;
@@ -22,7 +26,50 @@ class SliderHitObject extends ContainerObject {
 		this.edgeSounds = [];
 		this.tickerSound = null;
 		this.comboNumber = 0;
+		this.type = type;
 		Object.assign(this, metadata);
+
+		this.path['end'] = osuScale(this.path['end']);
+
+		if (this.path.sliderType === 'perfect') {
+			this.path['passthrough'] = osuScale(this.path['passthrough']);
+			let perfPath = CircularArcApproximator.CreateArc(
+				{ x: this.x, y: this.y },
+				{ x: this.path['passthrough'].x, y: this.path['passthrough'].y },
+				{ x: this.path['end'].x, y: this.path['end'].y },
+				0.1
+			);
+			console.log(perfPath);
+		}
+
+		this.bg = new PIXI.Graphics();
+		this.addChild(this.bg);
+
+		switch (this.path.sliderType) {
+			case 'perfect':
+				this.bg
+					.lineStyle(5, 0xff0000)
+					.moveTo(0, 0)
+					.quadraticCurveTo(
+						this.path['end'].x - this.x,
+						0,
+						this.path['end'].x - this.x,
+						this.path['end'].y - this.y
+					);
+				break;
+			case 'linear':
+			case 'bezier':
+			case 'catmull':
+			default:
+				if (this.path['end']) {
+					// todo FIX THIS
+					this.bg
+						.lineStyle(5, 0xff0000)
+						.moveTo(0, 0)
+						.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
+				}
+				break;
+		}
 
 		this.ticks = [];
 		this.numberOfTicks = Math.floor(
@@ -39,22 +86,7 @@ class SliderHitObject extends ContainerObject {
 
 		this._clicked = false;
 		this._repeatCounter = 0;
-
-		this.x = x;
-		this.y = y;
 		this._pointerDown = null;
-
-		this.bg = new PIXI.Graphics();
-		this.addChild(this.bg);
-		if (this.path['end']) {
-			this.path['end'] = osuScale(this.path['end']);
-
-			// todo FIX THIS
-			this.bg
-				.lineStyle(5, 0xff0000)
-				.moveTo(0, 0)
-				.lineTo(this.path['end'].x - this.x, this.path['end'].y - this.y);
-		}
 
 		if (this.repeat > 1) {
 			this.currentArrow = new GameObject(t_arrows, {
@@ -183,6 +215,20 @@ class SliderHitObject extends ContainerObject {
 		if (props) Object.assign(this, props);
 	}
 
+	/**
+	 *
+	 * @param {Array<Object>} p Array of xy points; should be length 3
+	 * @param {Number} t
+	 * @returns {{x: number, y: number}}
+	 * @private
+	 */
+	_quadraticCurve(p, t) {
+		let x = (1 - t) * (1 - t) * p[0].x + 2 * (1 - t) * t * p[1].x + t * t * p[2].x;
+		let y = (1 - t) * (1 - t) * p[0].y + 2 * (1 - t) * t * p[1].y + t * t * p[2].y;
+
+		return { x, y };
+	}
+
 	expire() {
 		console.warn('expire');
 		this.destroy();
@@ -228,12 +274,59 @@ class SliderHitObject extends ContainerObject {
 				}
 			}
 
-			if (this.direction === SliderHitObject.Directions.FORWARD) {
-				this.target.x = lerp(0, this.path['end'].x - this.x, this.target._progress);
-				this.target.y = lerp(0, this.path['end'].y - this.y, this.target._progress);
-			} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
-				this.target.x = lerp(this.path['end'].x - this.x, 0, this.target._progress);
-				this.target.y = lerp(this.path['end'].y - this.y, 0, this.target._progress);
+			if (this.path.sliderType !== 'perfect') {
+				if (this.direction === SliderHitObject.Directions.FORWARD) {
+					this.target.x = lerp(0, this.path['end'].x - this.x, this.target._progress);
+					this.target.y = lerp(0, this.path['end'].y - this.y, this.target._progress);
+				} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
+					this.target.x = lerp(this.path['end'].x - this.x, 0, this.target._progress);
+					this.target.y = lerp(this.path['end'].y - this.y, 0, this.target._progress);
+				}
+			} else {
+				let pos = { x: 0, y: 0 };
+				if (this.direction === SliderHitObject.Directions.FORWARD) {
+					pos = this._quadraticCurve(
+						[
+							{
+								x: 0,
+								y: 0
+							},
+							{
+								x: this.path['end'].x - this.x,
+								y: 0
+							},
+							{
+								x: this.path['end'].x - this.x,
+								y: this.path['end'].y - this.y
+							}
+						],
+						this.target._progress
+					);
+
+					this.target.x = pos.x;
+					this.target.y = pos.y;
+				} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
+					pos = this._quadraticCurve(
+						[
+							{
+								x: this.path['end'].x - this.x,
+								y: this.path['end'].y - this.y
+							},
+							{
+								x: this.path['end'].x - this.x,
+								y: 0
+							},
+							{
+								x: 0,
+								y: 0
+							}
+						],
+						this.target._progress
+					);
+
+					this.target.x = pos.x;
+					this.target.y = pos.y;
+				}
 			}
 
 			for (let i = 0; i < this.numberOfTicks; i++) {
