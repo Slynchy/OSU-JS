@@ -94,56 +94,56 @@ class SliderHitObject extends ContainerObject {
 			alpha: true
 		});
 		this.particleEmitter = new __PIXIPARTICLES.Emitter(this.emitterContainer, t_spark, {
-			"alpha": {
-				"start": 1,
-				"end": 0
+			alpha: {
+				start: 1,
+				end: 0
 			},
-			"scale": {
-				"start": 0.5,
-				"end": 0.3,
-				"minimumScaleMultiplier": 1
+			scale: {
+				start: 0.5,
+				end: 0.3,
+				minimumScaleMultiplier: 1
 			},
-			"color": {
-				"start": "#e4f9ff",
-				"end": "#3fcbff"
+			color: {
+				start: '#e4f9ff',
+				end: '#3fcbff'
 			},
-			"speed": {
-				"start": 50,
-				"end": 50,
-				"minimumSpeedMultiplier": 1
+			speed: {
+				start: 50,
+				end: 50,
+				minimumSpeedMultiplier: 1
 			},
-			"acceleration": {
-				"x": 0,
-				"y": 0
+			acceleration: {
+				x: 0,
+				y: 0
 			},
-			"maxSpeed": 0,
-			"startRotation": {
-				"min": 0,
-				"max": 360
+			maxSpeed: 0,
+			startRotation: {
+				min: 0,
+				max: 360
 			},
-			"noRotation": false,
-			"rotationSpeed": {
-				"min": 0,
-				"max": 0
+			noRotation: false,
+			rotationSpeed: {
+				min: 0,
+				max: 0
 			},
-			"lifetime": {
-				"min": 0.2,
-				"max": 0.7
+			lifetime: {
+				min: 0.2,
+				max: 0.7
 			},
-			"blendMode": "normal",
-			"frequency": 0.001,
-			"emitterLifetime": -1,
-			"maxParticles": 500,
-			"pos": {
-				"x": 0,
-				"y": 0
+			blendMode: 'normal',
+			frequency: 0.001,
+			emitterLifetime: -1,
+			maxParticles: 500,
+			pos: {
+				x: 0,
+				y: 0
 			},
-			"addAtBack": false,
-			"spawnType": "circle",
-			"spawnCircle": {
-				"x": 0,
-				"y": 0,
-				"r": 0
+			addAtBack: false,
+			spawnType: 'circle',
+			spawnCircle: {
+				x: 0,
+				y: 0,
+				r: 0
 			}
 		});
 		this.addChild(this.emitterContainer);
@@ -334,7 +334,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	_playHitSFX(counter) {
-		if(!this.edgeSounds[counter]) return;
+		if (!this.edgeSounds[counter]) return;
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].sound.play();
 		}

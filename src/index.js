@@ -62,7 +62,7 @@ let resize = function() {
 		'style',
 		__CACHEDCSSSTYLE +
 			' ' +
-		'-ms-transform: scale(' +
+			'-ms-transform: scale(' +
 			scale +
 			'); -webkit-transform: scale3d(' +
 			scale +
