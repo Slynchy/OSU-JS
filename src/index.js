@@ -26,7 +26,7 @@ global.osuScale = function(x, y) {
 	}
 };
 
-global.GetOSUFile = function(name){
+global.GetOSUFile = function(name) {
 	return global._OSUFILECACHE[name];
 };
 

@@ -315,7 +315,6 @@ class Game extends Token {
 			for (let k in entry['edgeHitsounds'][i]) {
 				if (entry['edgeHitsounds'][i][k] === true || k === 'normal') {
 					let file = ('snd_' + this._activeSampleSet + '_hit' + k).toLowerCase();
-
 					if (global.hasOwnProperty(file)) {
 						result[i].push(global[file]);
 					} else {

@@ -40,18 +40,16 @@ class FlowController {
 
 	startMainMenu() {
 		this.currentAction = this.onMainMenu;
-		this.mainMenu = AddToken(new Settings.flowSettings.mainMenuToken(()=>{
+		this.mainMenu = AddToken(
+			new Settings.flowSettings.mainMenuToken(() => {
 				this.currentAction = this.startLoading;
 				RemoveToken(this.mainMenu);
 				this.mainMenu = null;
-			},
-			{
-
-			})
+			}, {})
 		);
 	}
 
-	onMainMenu(){}
+	onMainMenu() {}
 
 	startLoading() {
 		console.log('[flowController] startLoading');
@@ -61,8 +59,8 @@ class FlowController {
 				this.currentAction = this.finishedLoading;
 				console.log('[FlowController] Finished loading initial assets');
 			},
-			() => {
-				console.error('error');
+			err => {
+				console.error(err);
 			}
 		);
 

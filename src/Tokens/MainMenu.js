@@ -35,7 +35,7 @@ class MainMenu extends Token {
 		// this function is called at the end of a frame
 	}
 
-	_onClose(){
+	_onClose() {
 		this.onClose();
 	}
 
