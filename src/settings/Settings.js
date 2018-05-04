@@ -92,7 +92,9 @@ class Settings {
 
 			t_circle_glow: 'circle_glow.png',
 			t_arrows: 'arrows.png',
-			t_spark: 'spark.png'
+			t_spark: 'spark.png',
+
+			STYX_HELIX: 'STYX_HELIX/STYX_HELIX.osu'
 		};
 
 		this.Leaderboards = {

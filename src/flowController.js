@@ -2,8 +2,6 @@ let osujson = require('osu-json');
 let OSZHandler = require('./OSZHandler/OSZHandler.js');
 let LoadingScreen = require('./Tokens/LoadingScreen.js');
 
-import osuFile from './assets/STYX_HELIX/STYX_HELIX.osu';
-
 class FlowController {
 	constructor() {
 		this.game = null;
@@ -78,11 +76,9 @@ class FlowController {
 		'use strict';
 		this.currentAction = this.waitForOsuFile;
 
-		osujson.ParseOSUFileAsync(osuFile).then(output => {
+		osujson.ParseOSUFileAsync(GetOSUFile('STYX_HELIX')).then(output => {
 			this._osuFile = output;
-			console.log(this._osuFile);
 			OSZHandler.HandleOSUFile(output).then(result => {
-				console.log(result);
 				this._osuFile = result;
 				RemoveToken(this.loadingScreen);
 				this.currentAction = this.startGame;

@@ -26,6 +26,10 @@ global.osuScale = function(x, y) {
 	}
 };
 
+global.GetOSUFile = function(name){
+	return global._OSUFILECACHE[name];
+};
+
 require('./engine/FBInstant.js');
 
 const Settings = (global.Settings = require('./Settings/Settings.js'));
