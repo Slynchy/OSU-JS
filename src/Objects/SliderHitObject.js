@@ -336,7 +336,7 @@ class SliderHitObject extends ContainerObject {
 	_playHitSFX(counter) {
 		if (!this.edgeSounds[counter]) return;
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
-			this.edgeSounds[counter][i].sound.play();
+			this.edgeSounds[counter][i].play();
 		}
 	}
 
@@ -347,16 +347,14 @@ class SliderHitObject extends ContainerObject {
 		}
 
 		for (let i = 0; i < this.tickerSound.length; i++) {
-			this.tickerSound[i].sound.loop = true;
-			this.tickerSound[i].sound.play();
+			this.tickerSound[i].loop = true;
+			this.tickerSound[i].play();
 		}
 	}
 
 	_stopTickerSFX() {
 		for (let i = 0; i < this.tickerSound.length; i++) {
-			//if(this.tickerSound[i].sound.isPlaying){
-			this.tickerSound[i].sound.stop();
-			//}
+			this.tickerSound[i].stop();
 		}
 	}
 

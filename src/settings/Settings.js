@@ -4,7 +4,7 @@ let mainMenu = require('../Tokens/MainMenu.js');
 class Settings {
 	constructor() {
 		this.DEBUG = {
-			suppressLoadingLogs: false
+			suppressLoadingLogs: true
 		};
 
 		this.SaveData = {
