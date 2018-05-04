@@ -37,9 +37,23 @@ class FlowController {
 	 * Every implementation of FlowController MUST have an entry() function
 	 */
 	entry() {
-		console.log('[flowController] entry');
-		this.currentAction = this.startLoading;
+		this.currentAction = this.startMainMenu;
 	}
+
+	startMainMenu() {
+		this.currentAction = this.onMainMenu;
+		this.mainMenu = AddToken(new Settings.flowSettings.mainMenuToken(()=>{
+				this.currentAction = this.startLoading;
+				RemoveToken(this.mainMenu);
+				this.mainMenu = null;
+			},
+			{
+
+			})
+		);
+	}
+
+	onMainMenu(){}
 
 	startLoading() {
 		console.log('[flowController] startLoading');

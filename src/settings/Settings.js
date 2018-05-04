@@ -1,4 +1,5 @@
 let game = require('../game.js');
+let mainMenu = require('../Tokens/MainMenu.js');
 
 class Settings {
 	constructor() {
@@ -110,7 +111,7 @@ class Settings {
 		};
 
 		this.flowSettings = {
-			mainMenuToken: null,
+			mainMenuToken: mainMenu,
 			gameToken: game
 		};
 

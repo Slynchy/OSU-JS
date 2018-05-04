@@ -48,6 +48,7 @@ class Game extends Token {
 		this.score = 0;
 		this.scoreDisplay = new Text({
 			text: '0',
+			alpha: 0,
 			x: Settings.applicationSettings.width / 2,
 			style: new PIXI.TextStyle({
 				align: 'center',
@@ -56,6 +57,20 @@ class Game extends Token {
 			})
 		});
 		this.scene.addChild(this.scoreDisplay);
+
+		let loadingText = new Text({
+			text: 'Loading audio file...',
+			x: Settings.applicationSettings.width / 2,
+			y: Settings.applicationSettings.height / 2,
+			style: new PIXI.TextStyle({
+				align: 'center',
+				fontSize: osuScale(22),
+				fill: '#ff0000'
+			})
+		});
+		loadingText.anchor.x = 0.5;
+		loadingText.anchor.y = 0.5;
+		this.scene.addChild(loadingText);
 
 		Application.stage.addChild(this.scene);
 
@@ -71,6 +86,10 @@ class Game extends Token {
 
 			this.__AUDIOSRC.connect(this.__AUDIOGAIN);
 			this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
+
+			this.scoreDisplay.alpha = 1;
+			this.scene.removeChild(loadingText);
+			loadingText = null;
 
 			this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
 			this._createScheduler();
