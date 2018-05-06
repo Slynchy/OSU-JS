@@ -33,13 +33,12 @@ class SliderHitObject extends ContainerObject {
 
 		if (this.path.sliderType === 'perfect') {
 			this.path['passthrough'] = osuScale(this.path['passthrough']);
-			let perfPath = CircularArcApproximator.CreateArc(
+			this.perfPath = CircularArcApproximator.CreateArc(
 				{ x: this.x, y: this.y },
 				{ x: this.path['passthrough'].x, y: this.path['passthrough'].y },
 				{ x: this.path['end'].x, y: this.path['end'].y },
 				0.1
 			);
-			console.log(perfPath);
 		}
 
 		this.bg = new PIXI.Graphics();
@@ -49,13 +48,13 @@ class SliderHitObject extends ContainerObject {
 			case 'perfect':
 				this.bg
 					.lineStyle(5, 0xff0000)
-					.moveTo(0, 0)
-					.quadraticCurveTo(
-						this.path['end'].x - this.x,
-						0,
-						this.path['end'].x - this.x,
-						this.path['end'].y - this.y
+					.moveTo(0, 0);
+				for(let i = 0; i < this.perfPath.length; i++){
+					this.bg.lineTo(
+						this.perfPath[i].x - this.x,
+						this.perfPath[i].y - this.y
 					);
+				}
 				break;
 			case 'linear':
 			case 'bezier':
@@ -94,7 +93,13 @@ class SliderHitObject extends ContainerObject {
 				y: this.path['end'].y - this.y,
 				_sliderPos: 'end',
 				rotation:
-					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+					this.perfPath ?
+						Math.atan2(
+							this.perfPath[this.perfPath.length-1].y - this.perfPath[this.perfPath.length-2].y,
+							this.perfPath[this.perfPath.length-1].x - this.perfPath[this.perfPath.length-2].x
+						) - Math.PI
+						:
+						Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
 			});
 			this.currentArrow.anchor.y = 0.5;
 			this.currentArrow.scale.x = osuScale(0.2, 0.2).x;
@@ -160,12 +165,12 @@ class SliderHitObject extends ContainerObject {
 			},
 			lifetime: {
 				min: 0.2,
-				max: 0.7
+				max: 0.5
 			},
 			blendMode: 'normal',
 			frequency: 0.001,
 			emitterLifetime: -1,
-			maxParticles: 500,
+			maxParticles: 275,
 			pos: {
 				x: 0,
 				y: 0
@@ -283,50 +288,7 @@ class SliderHitObject extends ContainerObject {
 					this.target.y = lerp(this.path['end'].y - this.y, 0, this.target._progress);
 				}
 			} else {
-				let pos = { x: 0, y: 0 };
-				if (this.direction === SliderHitObject.Directions.FORWARD) {
-					pos = this._quadraticCurve(
-						[
-							{
-								x: 0,
-								y: 0
-							},
-							{
-								x: this.path['end'].x - this.x,
-								y: 0
-							},
-							{
-								x: this.path['end'].x - this.x,
-								y: this.path['end'].y - this.y
-							}
-						],
-						this.target._progress
-					);
-
-					this.target.x = pos.x;
-					this.target.y = pos.y;
-				} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
-					pos = this._quadraticCurve(
-						[
-							{
-								x: this.path['end'].x - this.x,
-								y: this.path['end'].y - this.y
-							},
-							{
-								x: this.path['end'].x - this.x,
-								y: 0
-							},
-							{
-								x: 0,
-								y: 0
-							}
-						],
-						this.target._progress
-					);
-
-					this.target.x = pos.x;
-					this.target.y = pos.y;
-				}
+				this._handlePerfCircleMovement();
 			}
 
 			for (let i = 0; i < this.numberOfTicks; i++) {
@@ -338,6 +300,74 @@ class SliderHitObject extends ContainerObject {
 				}
 			}
 		}
+	}
+
+	_handlePerfCircleMovement(){
+		let pos = { x: 0, y: 0 };
+		if (this.direction === SliderHitObject.Directions.FORWARD) {
+			if(Math.floor(this.perfPath.length * this.target._progress)+1 >= this.perfPath.length) return;
+			pos.x = lerp(
+				this.perfPath[
+					Math.floor(this.perfPath.length * this.target._progress)
+				].x - this.x,
+
+				this.perfPath[
+					Math.floor(this.perfPath.length * this.target._progress)+1
+				].x - this.x,
+
+				(this.perfPath.length * this.target._progress) % 1
+			);
+			pos.y = lerp(
+				this.perfPath[
+					Math.floor(this.perfPath.length * this.target._progress)
+				].y - this.y,
+
+				this.perfPath[
+					Math.floor(this.perfPath.length * this.target._progress)+1
+				].y - this.y,
+
+				(this.perfPath.length * this.target._progress) % 1
+			);
+		} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
+
+			if(Math.floor(
+				((this.perfPath.length * this.target._progress) * -1) + this.perfPath.length
+			)-1 <= 0) return;
+
+			pos.x = lerp(
+				this.perfPath[
+					Math.floor(
+						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+					)
+				].x - this.x,
+
+				this.perfPath[
+					Math.floor(
+						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+					)-1
+				].x - this.x,
+
+				(this.perfPath.length * this.target._progress) % 1
+			);
+			pos.y = lerp(
+				this.perfPath[
+					Math.floor(
+						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+					)
+				].y - this.y,
+
+				this.perfPath[
+					Math.floor(
+						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+					)-1
+				].y - this.y,
+
+				(this.perfPath.length * this.target._progress) % 1
+			);
+		}
+
+		this.target.x = pos.x;
+		this.target.y = pos.y;
 	}
 
 	onDestroy() {
@@ -362,20 +392,33 @@ class SliderHitObject extends ContainerObject {
 		} else {
 			this.currentArrow._sliderPos = 'start';
 		}
-		//  x: this.path['end'].x - this.x,
-		// 	y: this.path['end'].y - this.y,
-		// 	_sliderPos: 'end',
-		// 	rotation:
-		//  Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
 
 		this.currentArrow.x =
 			this.currentArrow._sliderPos === 'start' ? 0 : this.path['end'].x - this.x;
 		this.currentArrow.y =
 			this.currentArrow._sliderPos === 'start' ? 0 : this.path['end'].y - this.y;
-		this.currentArrow.rotation =
-			this.currentArrow._sliderPos === 'start'
-				? Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x)
-				: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
+
+		if(this.currentArrow._sliderPos === 'start'){
+			if(this.perfPath){
+				this.currentArrow.rotation = Math.atan2(
+					this.perfPath[this.perfPath.length-1].y - this.perfPath[this.perfPath.length-2].y,
+					this.perfPath[this.perfPath.length-1].x - this.perfPath[this.perfPath.length-2].x
+				) - Math.PI;
+			} else {
+				this.currentArrow.rotation =
+					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x)
+			}
+		} else {
+			if(this.perfPath){
+				this.currentArrow.rotation = Math.atan2(
+					this.perfPath[0].y - this.y,
+					this.perfPath[0].x - this.x
+				) - Math.PI;
+			} else {
+				this.currentArrow.rotation =
+					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+			}
+		}
 	}
 
 	score(timeOffset) {
@@ -408,6 +451,8 @@ class SliderHitObject extends ContainerObject {
 		};
 
 		if (this.tickerSound.length > 0) console.log(this.tickerSound);
+
+		this.alpha = 1;
 
 		this._playHitSFX(this._repeatCounter);
 		this._playTickerSFX();
