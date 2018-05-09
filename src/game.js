@@ -20,6 +20,7 @@ class Game extends Token {
 		this.scene = new ContainerObject();
 		this._osuFile = osuFile;
 
+		this.difficulty = this.activeTrack.data['Difficulty'];
 		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
 		this._fadein = Game._calculateFadein(this.activeTrack.data['Difficulty']);
 		this._preempt = Game._calculatePreempt(this.activeTrack.data['Difficulty']);
@@ -56,6 +57,8 @@ class Game extends Token {
 				fill: '#ff0000'
 			})
 		});
+		this.scoreDisplay.anchor.x = 0.5;
+		this.scoreDisplay.anchor.y = 0;
 		this.scene.addChild(this.scoreDisplay);
 
 		let loadingText = new Text({
@@ -130,8 +133,8 @@ class Game extends Token {
 		throw new Error('AR not a number!');
 	}
 
-	calculateScore(difficulty, timestamp) {
-		return Game._calculateScore(difficulty, timestamp);
+	calculateScore(difficulty, timestamp, sliderVals) {
+		return Game._calculateScore(difficulty, timestamp, sliderVals);
 	}
 
 	static _calculateFadein(difficulty) {
@@ -152,25 +155,50 @@ class Game extends Token {
 	 *
 	 * @param difficulty
 	 * @param timestamp In milliseconds, the time between click and the perfect hit
+	 * @param {Array<Number>} sliderVals
 	 * @returns {number}
 	 * @private
 	 */
-	static _calculateScore(difficulty, timestamp) {
-		//let OD = difficulty['OverallDifficulty'];
-		let OD = difficulty;
+	static _calculateScore(difficulty, timestamp, sliderVals) {
+		let OD = difficulty['OverallDifficulty'];
 
 		if (timestamp < 0) timestamp = Math.abs(timestamp);
 
+		let hitValue = 0;
 		if (timestamp < 50 + 30 * (5 - OD) / 5) {
-			return 300;
+			hitValue = 300;
 		} else if (timestamp < 100 + 40 * (5 - OD) / 5) {
-			return 100;
+			hitValue = 100;
 		} else if (timestamp < 50 + 30 * (5 - OD) / 5) {
-			return 50;
+			hitValue = 50;
 		}
 
-		return 0;
-		//throw new Error('Invalid timestamp');
+		if(sliderVals){
+			for(let i = 0; i < sliderVals.length; i++){
+				hitValue += sliderVals[i];
+			}
+		}
+
+		let diffMult =
+			difficulty['CircleSize'] +
+			difficulty['HPDrainRate'] +
+			difficulty['OverallDifficulty'];
+		if(diffMult < 5){
+			diffMult = 2;
+		} else if(diffMult > 5 && diffMult < 13){
+			diffMult = 3;
+		} else if(diffMult > 13 && diffMult < 18){
+			diffMult = 4;
+		} else if(diffMult > 18 && diffMult < 24){
+			diffMult = 5;
+		} else if(diffMult > 24){
+			diffMult = 6;
+		}
+
+		let comboMult = 1; // TODO: Implement combo multiplier
+		let modMult = 1;
+
+		return Math.floor(hitValue + (hitValue * ((comboMult * diffMult * modMult) / 25)));
 	}
 
 	_createScheduler() {
@@ -236,8 +264,10 @@ class Game extends Token {
 					circleSize: this._circleSize,
 					repeat: current.repeat,
 					mpb: this._activeMPB,
+					tickRate: this.activeTrack.data['Difficulty']['SliderTickRate'],
 					comboNumber: ++this._currentComboCount,
-					tickerSound: this._getTickerSound(current),
+					tickerSound: this._getTickerSound(),
+					sliderSound: this._getSliderSound(current),
 					edgeSounds: this._getEdgeHitSounds(current),
 					duration:
 						current.pixelLength /
@@ -289,7 +319,16 @@ class Game extends Token {
 		return result;
 	}
 
-	_getTickerSound(entry) {
+	_getTickerSound() {
+		let file = ('snd_' + this._activeSampleSet + '_slidertick').toLowerCase();
+		if (global.hasOwnProperty(file)) {
+			return global[file];
+		} else {
+			throw new Error('Tickersound invalid!');
+		}
+	}
+
+	_getSliderSound(entry) {
 		let result = [];
 
 		for (let k in entry['hitSound']) {

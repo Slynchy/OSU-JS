@@ -25,9 +25,13 @@ class SliderHitObject extends ContainerObject {
 		this.mpb = 0;
 		this.edgeSounds = [];
 		this.tickerSound = null;
+		this.sliderSound = null;
 		this.comboNumber = 0;
 		this.type = type;
 		Object.assign(this, metadata);
+
+		this.hitTimestamp = 0;
+		this.sliderScores = [];
 
 		this.path['end'] = osuScale(this.path['end']);
 
@@ -72,15 +76,42 @@ class SliderHitObject extends ContainerObject {
 
 		this.ticks = [];
 		this.numberOfTicks = Math.floor(
-			this.duration / (this.mpb === 0 ? this.duration * 2 : this.mpb)
+			this.duration / (this.mpb + 0.001) // hack
 		);
+
 		if (this.numberOfTicks > 0) {
 			for (let i = 0; i < this.numberOfTicks; i++) {
-				this.ticks.push({
-					done: false,
-					timestamp: this.mpb * i + 1
-				});
+				for(let r = 1; r <= this.repeat; r++){
+					this.ticks.push({
+						done: false,
+						timestamp: (this.mpb * (i + 1)) * (r)
+					});
+				}
 			}
+		}
+
+		this.tickerObjects = [];
+		for(let i = 0; i < this.numberOfTicks; i++){
+			let tempTick = new GameObject(t_white, {
+				x: this.perfPath ?
+					this.perfPath[
+						Math.floor(this.perfPath.length * ((1 / (this.numberOfTicks+1)) * (i+1)))
+					].x - this.x
+					:
+					lerp(0, this.path['end'].x - this.x, ((1 / (this.numberOfTicks+1)) * (i+1))),
+				y: this.perfPath ?
+					this.perfPath[
+						Math.floor(this.perfPath.length * (((1 / (this.numberOfTicks+1)) * (i+1))))
+					].y - this.y
+					:
+					lerp(0, this.path['end'].y - this.y, ((1 / (this.numberOfTicks+1)) * (i+1))),
+				width: 10,
+				height: 10
+			});
+			tempTick.anchor.x = 0.5;
+			tempTick.anchor.y = 0.5;
+			this.tickerObjects.push(tempTick);
+			this.addChild(this.tickerObjects[this.tickerObjects.length-1]);
 		}
 
 		this._clicked = false;
@@ -220,20 +251,6 @@ class SliderHitObject extends ContainerObject {
 		if (props) Object.assign(this, props);
 	}
 
-	/**
-	 *
-	 * @param {Array<Object>} p Array of xy points; should be length 3
-	 * @param {Number} t
-	 * @returns {{x: number, y: number}}
-	 * @private
-	 */
-	_quadraticCurve(p, t) {
-		let x = (1 - t) * (1 - t) * p[0].x + 2 * (1 - t) * t * p[1].x + t * t * p[2].x;
-		let y = (1 - t) * (1 - t) * p[0].y + 2 * (1 - t) * t * p[1].y + t * t * p[2].y;
-
-		return { x, y };
-	}
-
 	expire() {
 		console.warn('expire');
 		this.destroy();
@@ -248,14 +265,14 @@ class SliderHitObject extends ContainerObject {
 			this.particleEmitter.update(dt * 0.001);
 		}
 
-		if (this._progressPreempt < 1) {
-			if (this.alpha < 1) this.alpha += dt / this.fadein;
-			else this.alpha = 1;
-		} else {
-			this.alpha = 3 - 2 * this._progressPreempt;
-		}
-
 		if (!this._clicked) {
+			if (this._progressPreempt < 1) {
+				if (this.alpha < 1) this.alpha += dt / this.fadein;
+				else this.alpha = 1;
+			} else {
+				this.alpha = 3 - 2 * this._progressPreempt;
+			}
+
 			this._progressPreempt += dt / this.preempt;
 			this.outline.scale.x = this.outline.scale.y = 3 - 2 * this._progressPreempt;
 
@@ -276,6 +293,7 @@ class SliderHitObject extends ContainerObject {
 					return;
 				} else {
 					this.reverseDirection();
+					this.sliderScores.push(30);
 				}
 			}
 
@@ -291,12 +309,15 @@ class SliderHitObject extends ContainerObject {
 				this._handlePerfCircleMovement();
 			}
 
-			for (let i = 0; i < this.numberOfTicks; i++) {
+			for (let i = 0; i < this.ticks.length; i++) {
 				if (
-					this.target._progress * this.duration > this.ticks[i].timestamp &&
+					(this.target._progress * (this._repeatCounter+1)) * this.duration  > this.ticks[i].timestamp &&
 					this.ticks[i].done === false
 				) {
 					this.ticks[i].done = true;
+					this.sliderScores.push(10);
+					if(this.tickerSound)
+						this.tickerSound.play();
 				}
 			}
 		}
@@ -371,7 +392,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	onDestroy() {
-		this._stopTickerSFX();
+		this._stopSliderSFX();
 	}
 
 	reverseDirection() {
@@ -421,10 +442,18 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
-	score(timeOffset) {
+	score() {
+		this.sliderScores.push(30);
+
 		if (this.game) {
-			//this.game.addScore(this.game._calculateScore(this.game.overallDifficulty, timeOffset));
-			this.game.addScore(50);
+			this.game.addScore(
+				this.game.calculateScore(
+					this.game.difficulty,
+					this.hitTimestamp,
+					this.sliderScores
+				)
+			);
+			//this.game.addScore(50);
 		} else {
 			throw new Error('No game reference on object!');
 		}
@@ -450,12 +479,15 @@ class SliderHitObject extends ContainerObject {
 			y: ev.data.global.y
 		};
 
-		if (this.tickerSound.length > 0) console.log(this.tickerSound);
-
 		this.alpha = 1;
 
+		this.hitTimestamp = this.preempt * this._progressPreempt;
+		this.hitTimestamp = this.preempt - this.hitTimestamp;
+
+		this.sliderScores.push(30);
+
 		this._playHitSFX(this._repeatCounter);
-		this._playTickerSFX();
+		this._playSliderSFX();
 
 		this._clicked = true;
 	}
@@ -478,21 +510,25 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
-	_playTickerSFX() {
-		if (!Array.isArray(this.tickerSound)) {
-			let temp = this.tickerSound;
-			this.tickerSound = [temp];
+	_playSliderSFX() {
+		if (!Array.isArray(this.sliderSound)) {
+			let temp = this.sliderSound;
+			this.sliderSound = [temp];
 		}
 
-		for (let i = 0; i < this.tickerSound.length; i++) {
-			this.tickerSound[i].loop = true;
-			this.tickerSound[i].play();
+		if(this.sliderSound.length !== 0){
+			console.log("Playing %i Slider sounds")
+		}
+
+		for (let i = 0; i < this.sliderSound.length; i++) {
+			this.sliderSound[i].loop = true;
+			this.sliderSound[i].play();
 		}
 	}
 
-	_stopTickerSFX() {
-		for (let i = 0; i < this.tickerSound.length; i++) {
-			this.tickerSound[i].stop();
+	_stopSliderSFX() {
+		for (let i = 0; i < this.sliderSound.length; i++) {
+			this.sliderSound[i].stop();
 		}
 	}
 
