@@ -83,6 +83,30 @@ class SliderHitObject extends ContainerObject {
 			}
 		}
 
+		this.tickerObjects = [];
+		for(let i = 0; i < this.numberOfTicks; i++){
+			let tempTick = new GameObject(t_white, {
+				x: this.perfPath ?
+					this.perfPath[
+						Math.floor(this.perfPath.length * ((1 / (this.numberOfTicks+1)) * (i+1)))
+					].x - this.x
+					:
+					lerp(0, this.path['end'].x - this.x, ((1 / (this.numberOfTicks+1)) * (i+1))),
+				y: this.perfPath ?
+					this.perfPath[
+						Math.floor(this.perfPath.length * (((1 / (this.numberOfTicks+1)) * (i+1))))
+					].y - this.y
+					:
+					lerp(0, this.path['end'].y - this.y, ((1 / (this.numberOfTicks+1)) * (i+1))),
+				width: 10,
+				height: 10
+			});
+			tempTick.anchor.x = 0.5;
+			tempTick.anchor.y = 0.5;
+			this.tickerObjects.push(tempTick);
+			this.addChild(this.tickerObjects[this.tickerObjects.length-1]);
+		}
+
 		this._clicked = false;
 		this._repeatCounter = 0;
 		this._pointerDown = null;
@@ -297,6 +321,7 @@ class SliderHitObject extends ContainerObject {
 					this.ticks[i].done === false
 				) {
 					this.ticks[i].done = true;
+					console.log(this);
 				}
 			}
 		}
@@ -482,6 +507,10 @@ class SliderHitObject extends ContainerObject {
 		if (!Array.isArray(this.tickerSound)) {
 			let temp = this.tickerSound;
 			this.tickerSound = [temp];
+		}
+
+		if(this.tickerSound.length != 0){
+			console.log("Playing %i ticker sounds")
 		}
 
 		for (let i = 0; i < this.tickerSound.length; i++) {
