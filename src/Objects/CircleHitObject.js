@@ -87,7 +87,7 @@ class CircleHitObject extends GameObject {
 		timeOffset = this.preempt - timeOffset;
 		// if timeOffset is negative it's fine
 
-		let score = this.game.calculateScore(this.game.overallDifficulty, timeOffset);
+		let score = this.game.calculateScore(this.game.difficulty, timeOffset);
 
 		if (this.game) {
 			this.game.addScore(score);
