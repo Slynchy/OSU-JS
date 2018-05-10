@@ -182,7 +182,7 @@ class SliderHitObject extends ContainerObject {
 			},
 			acceleration: {
 				x: 0,
-				y: 0
+				y: 600
 			},
 			maxSpeed: 0,
 			startRotation: {
@@ -289,11 +289,19 @@ class SliderHitObject extends ContainerObject {
 
 			if (this.target._progress >= 1) {
 				if (this._repeatCounter + 1 >= this.repeat) {
+					if(this.isPointerOver() === true) {
+						this._playHitSFX(this._repeatCounter + 1);
+						this.sliderScores.push(30);
+					}
 					this.score();
 					return;
 				} else {
+					++this._repeatCounter;
 					this.reverseDirection();
-					this.sliderScores.push(30);
+					if(this.isPointerOver() === true) {
+						this._playHitSFX(this._repeatCounter);
+						this.sliderScores.push(30);
+					}
 				}
 			}
 
@@ -315,9 +323,12 @@ class SliderHitObject extends ContainerObject {
 					this.ticks[i].done === false
 				) {
 					this.ticks[i].done = true;
-					this.sliderScores.push(10);
-					if(this.tickerSound)
-						this.tickerSound.play();
+
+					if(this.isPointerOver() === true){
+						this.sliderScores.push(10);
+						if(this.tickerSound)
+							this.tickerSound.play();
+					}
 				}
 			}
 		}
@@ -398,7 +409,6 @@ class SliderHitObject extends ContainerObject {
 	reverseDirection() {
 		this.direction = !this.direction;
 		this.target._progress = 0;
-		this._playHitSFX(++this._repeatCounter);
 
 		if (this._repeatCounter + 1 < this.repeat) {
 			this._reverseArrow();
@@ -442,6 +452,42 @@ class SliderHitObject extends ContainerObject {
 		}
 	}
 
+	/**
+	 * https://stackoverflow.com/questions/8331243/circle-collision-javascript
+	 * @param p1x
+	 * @param p1y
+	 * @param r1
+	 * @param p2x
+	 * @param p2y
+	 * @param r2
+	 * @returns {boolean}
+	 * @private
+	 */
+	_collision (p1x, p1y, r1, p2x, p2y, r2) {
+		let a;
+		let x;
+		let y;
+
+		a = r1 + r2;
+		x = p1x - p2x;
+		y = p1y - p2y;
+
+		return a > Math.sqrt((x * x) + (y * y));
+	}
+
+	isPointerOver(){
+		if(this.isPointerDown() === false) return false;
+		else
+			return this._collision(
+				this._pointerDown.x,
+				this._pointerDown.y,
+				6,
+				this.target.x + this.x,
+				this.target.y + this.y,
+				this.circleSize
+			);
+	}
+
 	score() {
 		this.sliderScores.push(30);
 
@@ -457,8 +503,6 @@ class SliderHitObject extends ContainerObject {
 		} else {
 			throw new Error('No game reference on object!');
 		}
-
-		this._playHitSFX(this._repeatCounter + 1);
 
 		this.destroy();
 	}
