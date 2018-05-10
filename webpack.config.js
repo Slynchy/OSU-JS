@@ -33,7 +33,18 @@ const rules = [
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: ['babel-loader', 'eslint-loader']
-    }
+    },
+	{
+		test: /\.ttf$/,
+		use: [
+			{
+				loader: 'ttf-loader',
+				options: {
+					name: './font/[hash].[ext]',
+				},
+			},
+		]
+	}
 ];
 
 publicPath = '';
