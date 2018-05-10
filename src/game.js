@@ -48,12 +48,13 @@ class Game extends Token {
 
 		this.score = 0;
 		this.scoreDisplay = new Text({
-			text: '0',
+			text: '12345',
 			alpha: 0,
 			x: Settings.applicationSettings.width / 2,
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(22),
+				fontFamily: fnt_exo_20_black,
 				fill: '#ff0000'
 			})
 		});
@@ -68,6 +69,7 @@ class Game extends Token {
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(22),
+				fontFamily: fnt_exo_20_black,
 				fill: '#ff0000'
 			})
 		});
@@ -99,6 +101,7 @@ class Game extends Token {
 			this._scheduleHitObjectSpawns();
 			this._scheduleTimingPoints();
 			this._playTrack();
+			this._updateScore();
 		});
 	}
 
