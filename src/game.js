@@ -19,6 +19,7 @@ class Game extends Token {
 		this.name = 'Game';
 		this.scene = new ContainerObject();
 		this._osuFile = osuFile;
+		this.globalVolume = Settings.audioSettings.globalVolume;
 
 		this.difficulty = this.activeTrack.data['Difficulty'];
 		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
@@ -176,32 +177,30 @@ class Game extends Token {
 			hitValue = 50;
 		}
 
-		if(sliderVals){
-			for(let i = 0; i < sliderVals.length; i++){
+		if (sliderVals) {
+			for (let i = 0; i < sliderVals.length; i++) {
 				hitValue += sliderVals[i];
 			}
 		}
 
 		let diffMult =
-			difficulty['CircleSize'] +
-			difficulty['HPDrainRate'] +
-			difficulty['OverallDifficulty'];
-		if(diffMult < 5){
+			difficulty['CircleSize'] + difficulty['HPDrainRate'] + difficulty['OverallDifficulty'];
+		if (diffMult < 5) {
 			diffMult = 2;
-		} else if(diffMult > 5 && diffMult < 13){
+		} else if (diffMult > 5 && diffMult < 13) {
 			diffMult = 3;
-		} else if(diffMult > 13 && diffMult < 18){
+		} else if (diffMult > 13 && diffMult < 18) {
 			diffMult = 4;
-		} else if(diffMult > 18 && diffMult < 24){
+		} else if (diffMult > 18 && diffMult < 24) {
 			diffMult = 5;
-		} else if(diffMult > 24){
+		} else if (diffMult > 24) {
 			diffMult = 6;
 		}
 
 		let comboMult = 1; // TODO: Implement combo multiplier
 		let modMult = 1;
 
-		return Math.floor(hitValue + (hitValue * ((comboMult * diffMult * modMult) / 25)));
+		return Math.floor(hitValue + hitValue * (comboMult * diffMult * modMult / 25));
 	}
 
 	_createScheduler() {
@@ -241,7 +240,7 @@ class Game extends Token {
 		for (let i = 1; i < this.activeTrack.data['TimingPoints'].length; i++) {
 			let current = this.activeTrack.data['TimingPoints'][i];
 
-			this._trackClock.insert(current.offset * 0.001, this._setTimingPointData, current);
+			this._trackClock.insert(current.offset * 0.001, this._setTimingPointData.bind(this), current);
 		}
 	}
 
@@ -370,9 +369,15 @@ class Game extends Token {
 	}
 
 	_setTimingPointData(tpoint) {
-		this._activeMPB = tpoint.mpb;
-		this._activeMeter = tpoint.meter;
-		this._activeSampleSet = tpoint.sampleSet;
+		let tempTpoint = null;
+		if(tpoint.args) tempTpoint = tpoint.args;
+		else tempTpoint = tpoint;
+
+		this._activeMPB = tempTpoint.mpb;
+		this._activeMeter = tempTpoint.meter;
+		this._activeSampleSet = tempTpoint.sampleSet;
+
+		if (PIXI.sound) PIXI.sound.volumeAll = (tempTpoint.volume * 0.01) * this.globalVolume;
 
 		// todo
 

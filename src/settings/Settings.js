@@ -103,7 +103,7 @@ class Settings {
 		};
 
 		this.audioSettings = {
-			globalVolume: 1.0,
+			globalVolume: 0.15,
 			sfxVolume: 1.0, // unused
 			musicVolume: 1.0 // unused
 		};

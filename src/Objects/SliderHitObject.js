@@ -50,14 +50,9 @@ class SliderHitObject extends ContainerObject {
 
 		switch (this.path.sliderType) {
 			case 'perfect':
-				this.bg
-					.lineStyle(5, 0xff0000)
-					.moveTo(0, 0);
-				for(let i = 0; i < this.perfPath.length; i++){
-					this.bg.lineTo(
-						this.perfPath[i].x - this.x,
-						this.perfPath[i].y - this.y
-					);
+				this.bg.lineStyle(5, 0xff0000).moveTo(0, 0);
+				for (let i = 0; i < this.perfPath.length; i++) {
+					this.bg.lineTo(this.perfPath[i].x - this.x, this.perfPath[i].y - this.y);
 				}
 				break;
 			case 'linear':
@@ -81,37 +76,39 @@ class SliderHitObject extends ContainerObject {
 
 		if (this.numberOfTicks > 0) {
 			for (let i = 0; i < this.numberOfTicks; i++) {
-				for(let r = 1; r <= this.repeat; r++){
+				for (let r = 1; r <= this.repeat; r++) {
 					this.ticks.push({
 						done: false,
-						timestamp: (this.mpb * (i + 1)) * (r)
+						timestamp: this.mpb * (i + 1) * r
 					});
 				}
 			}
 		}
 
 		this.tickerObjects = [];
-		for(let i = 0; i < this.numberOfTicks; i++){
+		for (let i = 0; i < this.numberOfTicks; i++) {
 			let tempTick = new GameObject(t_white, {
-				x: this.perfPath ?
-					this.perfPath[
-						Math.floor(this.perfPath.length * ((1 / (this.numberOfTicks+1)) * (i+1)))
+				x: this.perfPath
+					? this.perfPath[
+							Math.floor(
+								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
+							)
 					].x - this.x
-					:
-					lerp(0, this.path['end'].x - this.x, ((1 / (this.numberOfTicks+1)) * (i+1))),
-				y: this.perfPath ?
-					this.perfPath[
-						Math.floor(this.perfPath.length * (((1 / (this.numberOfTicks+1)) * (i+1))))
+					: lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1)),
+				y: this.perfPath
+					? this.perfPath[
+							Math.floor(
+								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
+							)
 					].y - this.y
-					:
-					lerp(0, this.path['end'].y - this.y, ((1 / (this.numberOfTicks+1)) * (i+1))),
+					: lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1)),
 				width: 10,
 				height: 10
 			});
 			tempTick.anchor.x = 0.5;
 			tempTick.anchor.y = 0.5;
 			this.tickerObjects.push(tempTick);
-			this.addChild(this.tickerObjects[this.tickerObjects.length-1]);
+			this.addChild(this.tickerObjects[this.tickerObjects.length - 1]);
 		}
 
 		this._clicked = false;
@@ -123,14 +120,14 @@ class SliderHitObject extends ContainerObject {
 				x: this.path['end'].x - this.x,
 				y: this.path['end'].y - this.y,
 				_sliderPos: 'end',
-				rotation:
-					this.perfPath ?
-						Math.atan2(
-							this.perfPath[this.perfPath.length-1].y - this.perfPath[this.perfPath.length-2].y,
-							this.perfPath[this.perfPath.length-1].x - this.perfPath[this.perfPath.length-2].x
-						) - Math.PI
-						:
-						Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+				rotation: this.perfPath
+					? Math.atan2(
+							this.perfPath[this.perfPath.length - 1].y -
+								this.perfPath[this.perfPath.length - 2].y,
+							this.perfPath[this.perfPath.length - 1].x -
+								this.perfPath[this.perfPath.length - 2].x
+					) - Math.PI
+					: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
 			});
 			this.currentArrow.anchor.y = 0.5;
 			this.currentArrow.scale.x = osuScale(0.2, 0.2).x;
@@ -289,7 +286,7 @@ class SliderHitObject extends ContainerObject {
 
 			if (this.target._progress >= 1) {
 				if (this._repeatCounter + 1 >= this.repeat) {
-					if(this.isPointerOver() === true) {
+					if (this.isPointerOver() === true) {
 						this._playHitSFX(this._repeatCounter + 1);
 						this.sliderScores.push(30);
 					}
@@ -298,7 +295,7 @@ class SliderHitObject extends ContainerObject {
 				} else {
 					++this._repeatCounter;
 					this.reverseDirection();
-					if(this.isPointerOver() === true) {
+					if (this.isPointerOver() === true) {
 						this._playHitSFX(this._repeatCounter);
 						this.sliderScores.push(30);
 					}
@@ -319,64 +316,68 @@ class SliderHitObject extends ContainerObject {
 
 			for (let i = 0; i < this.ticks.length; i++) {
 				if (
-					(this.target._progress * (this._repeatCounter+1)) * this.duration  > this.ticks[i].timestamp &&
+					this.target._progress * (this._repeatCounter + 1) * this.duration >
+						this.ticks[i].timestamp &&
 					this.ticks[i].done === false
 				) {
 					this.ticks[i].done = true;
 
-					if(this.isPointerOver() === true){
+					if (this.isPointerOver() === true) {
 						this.sliderScores.push(10);
-						if(this.tickerSound)
-							this.tickerSound.play();
+						if (this.tickerSound) this.tickerSound.play();
 					}
 				}
 			}
 		}
 	}
 
-	_handlePerfCircleMovement(){
+	_handlePerfCircleMovement() {
 		let pos = { x: 0, y: 0 };
 		if (this.direction === SliderHitObject.Directions.FORWARD) {
-			if(Math.floor(this.perfPath.length * this.target._progress)+1 >= this.perfPath.length) return;
+			if (
+				Math.floor(this.perfPath.length * this.target._progress) + 1 >=
+				this.perfPath.length
+			)
+				return;
 			pos.x = lerp(
-				this.perfPath[
-					Math.floor(this.perfPath.length * this.target._progress)
-				].x - this.x,
+				this.perfPath[Math.floor(this.perfPath.length * this.target._progress)].x - this.x,
 
-				this.perfPath[
-					Math.floor(this.perfPath.length * this.target._progress)+1
-				].x - this.x,
+				this.perfPath[Math.floor(this.perfPath.length * this.target._progress) + 1].x -
+					this.x,
 
 				(this.perfPath.length * this.target._progress) % 1
 			);
 			pos.y = lerp(
-				this.perfPath[
-					Math.floor(this.perfPath.length * this.target._progress)
-				].y - this.y,
+				this.perfPath[Math.floor(this.perfPath.length * this.target._progress)].y - this.y,
 
-				this.perfPath[
-					Math.floor(this.perfPath.length * this.target._progress)+1
-				].y - this.y,
+				this.perfPath[Math.floor(this.perfPath.length * this.target._progress) + 1].y -
+					this.y,
 
 				(this.perfPath.length * this.target._progress) % 1
 			);
 		} else if (this.direction === SliderHitObject.Directions.BACKWARD) {
-
-			if(Math.floor(
-				((this.perfPath.length * this.target._progress) * -1) + this.perfPath.length
-			)-1 <= 0) return;
+			if (
+				Math.floor(
+					this.perfPath.length * this.target._progress * -1 + this.perfPath.length
+				) -
+					1 <=
+				0
+			)
+				return;
 
 			pos.x = lerp(
 				this.perfPath[
 					Math.floor(
-						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+						this.perfPath.length * this.target._progress * -1 +
+							(this.perfPath.length - 1)
 					)
 				].x - this.x,
 
 				this.perfPath[
 					Math.floor(
-						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
-					)-1
+						this.perfPath.length * this.target._progress * -1 +
+							(this.perfPath.length - 1)
+					) - 1
 				].x - this.x,
 
 				(this.perfPath.length * this.target._progress) % 1
@@ -384,14 +385,16 @@ class SliderHitObject extends ContainerObject {
 			pos.y = lerp(
 				this.perfPath[
 					Math.floor(
-						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
+						this.perfPath.length * this.target._progress * -1 +
+							(this.perfPath.length - 1)
 					)
 				].y - this.y,
 
 				this.perfPath[
 					Math.floor(
-						((this.perfPath.length * this.target._progress) * -1) + (this.perfPath.length-1)
-					)-1
+						this.perfPath.length * this.target._progress * -1 +
+							(this.perfPath.length - 1)
+					) - 1
 				].y - this.y,
 
 				(this.perfPath.length * this.target._progress) % 1
@@ -429,25 +432,28 @@ class SliderHitObject extends ContainerObject {
 		this.currentArrow.y =
 			this.currentArrow._sliderPos === 'start' ? 0 : this.path['end'].y - this.y;
 
-		if(this.currentArrow._sliderPos === 'start'){
-			if(this.perfPath){
-				this.currentArrow.rotation = Math.atan2(
-					this.perfPath[this.perfPath.length-1].y - this.perfPath[this.perfPath.length-2].y,
-					this.perfPath[this.perfPath.length-1].x - this.perfPath[this.perfPath.length-2].x
-				) - Math.PI;
-			} else {
+		if (this.currentArrow._sliderPos === 'start') {
+			if (this.perfPath) {
 				this.currentArrow.rotation =
-					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x)
+					Math.atan2(
+						this.perfPath[this.perfPath.length - 1].y -
+							this.perfPath[this.perfPath.length - 2].y,
+						this.perfPath[this.perfPath.length - 1].x -
+							this.perfPath[this.perfPath.length - 2].x
+					) - Math.PI;
+			} else {
+				this.currentArrow.rotation = Math.atan2(
+					this.path['end'].y - this.y,
+					this.path['end'].x - this.x
+				);
 			}
 		} else {
-			if(this.perfPath){
-				this.currentArrow.rotation = Math.atan2(
-					this.perfPath[0].y - this.y,
-					this.perfPath[0].x - this.x
-				) - Math.PI;
+			if (this.perfPath) {
+				this.currentArrow.rotation =
+					Math.atan2(this.perfPath[0].y - this.y, this.perfPath[0].x - this.x) - Math.PI;
 			} else {
 				this.currentArrow.rotation =
-					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
 			}
 		}
 	}
@@ -463,7 +469,7 @@ class SliderHitObject extends ContainerObject {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_collision (p1x, p1y, r1, p2x, p2y, r2) {
+	_collision(p1x, p1y, r1, p2x, p2y, r2) {
 		let a;
 		let x;
 		let y;
@@ -472,11 +478,11 @@ class SliderHitObject extends ContainerObject {
 		x = p1x - p2x;
 		y = p1y - p2y;
 
-		return a > Math.sqrt((x * x) + (y * y));
+		return a > Math.sqrt(x * x + y * y);
 	}
 
-	isPointerOver(){
-		if(this.isPointerDown() === false) return false;
+	isPointerOver() {
+		if (this.isPointerDown() === false) return false;
 		else
 			return this._collision(
 				this._pointerDown.x,
@@ -493,11 +499,7 @@ class SliderHitObject extends ContainerObject {
 
 		if (this.game) {
 			this.game.addScore(
-				this.game.calculateScore(
-					this.game.difficulty,
-					this.hitTimestamp,
-					this.sliderScores
-				)
+				this.game.calculateScore(this.game.difficulty, this.hitTimestamp, this.sliderScores)
 			);
 			//this.game.addScore(50);
 		} else {
@@ -560,8 +562,8 @@ class SliderHitObject extends ContainerObject {
 			this.sliderSound = [temp];
 		}
 
-		if(this.sliderSound.length !== 0){
-			console.log("Playing %i Slider sounds")
+		if (this.sliderSound.length !== 0) {
+			console.log('Playing %i Slider sounds');
 		}
 
 		for (let i = 0; i < this.sliderSound.length; i++) {
