@@ -120,18 +120,22 @@ class SliderHitObject extends ContainerObject {
 		this._pointerDown = null;
 
 		if (this.repeat > 1) {
+			let rotation;
+			if(this.perfPath){
+				rotation = Math.atan2(
+					this.perfPath[this.perfPath.length - 1].y -
+					this.perfPath[this.perfPath.length - 2].y,
+					this.perfPath[this.perfPath.length - 1].x -
+					this.perfPath[this.perfPath.length - 2].x
+				) - Math.PI;
+			} else {
+				rotation = Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
+			}
 			this.currentArrow = new GameObject(t_arrows, {
 				x: this.path['end'].x - this.x,
 				y: this.path['end'].y - this.y,
 				_sliderPos: 'end',
-				rotation: this.perfPath
-					? Math.atan2(
-							this.perfPath[this.perfPath.length - 1].y -
-								this.perfPath[this.perfPath.length - 2].y,
-							this.perfPath[this.perfPath.length - 1].x -
-								this.perfPath[this.perfPath.length - 2].x
-					  ) - Math.PI
-					: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+				rotation: rotation
 			});
 			this.currentArrow.anchor.y = 0.5;
 			this.currentArrow.scale.x = osuScale(0.2, 0.2).x;
