@@ -93,14 +93,14 @@ class SliderHitObject extends ContainerObject {
 							Math.floor(
 								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
 							)
-					].x - this.x
+					  ].x - this.x
 					: lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1)),
 				y: this.perfPath
 					? this.perfPath[
 							Math.floor(
 								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
 							)
-					].y - this.y
+					  ].y - this.y
 					: lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1)),
 				width: 10,
 				height: 10
@@ -126,7 +126,7 @@ class SliderHitObject extends ContainerObject {
 								this.perfPath[this.perfPath.length - 2].y,
 							this.perfPath[this.perfPath.length - 1].x -
 								this.perfPath[this.perfPath.length - 2].x
-					) - Math.PI
+					  ) - Math.PI
 					: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
 			});
 			this.currentArrow.anchor.y = 0.5;
@@ -550,7 +550,9 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	_playHitSFX(counter) {
-		if (!this.edgeSounds[counter]) return;
+		if (!this.edgeSounds[counter] || this.edgeSounds[counter].length === 0) {
+			console.warning('Does not have enough edge sounds!');
+		}
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].play();
 		}
