@@ -23,7 +23,7 @@ class SliderHitObject extends ContainerObject {
 		this.circleSize = 0;
 		this.repeat = 0;
 		this.mpb = 0;
-		this.edgeSounds = [];
+		this.edgeSounds = null;
 		this.tickerSound = null;
 		this.sliderSound = null;
 		this.comboNumber = 0;
@@ -87,21 +87,25 @@ class SliderHitObject extends ContainerObject {
 
 		this.tickerObjects = [];
 		for (let i = 0; i < this.numberOfTicks; i++) {
+			let x = 0,
+				y = 0;
+			if (this.perfPath) {
+				x = lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1));
+				y = lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1));
+			} else {
+				x =
+					this.perfPath[
+						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+					].x - this.x;
+				y =
+					this.perfPath[
+						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+					].y - this.y;
+			}
+
 			let tempTick = new GameObject(t_white, {
-				x: this.perfPath
-					? this.perfPath[
-							Math.floor(
-								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
-							)
-					].x - this.x
-					: lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1)),
-				y: this.perfPath
-					? this.perfPath[
-							Math.floor(
-								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
-							)
-					].y - this.y
-					: lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1)),
+				x: x,
+				y: y,
 				width: 10,
 				height: 10
 			});
@@ -116,18 +120,22 @@ class SliderHitObject extends ContainerObject {
 		this._pointerDown = null;
 
 		if (this.repeat > 1) {
+			let rotation;
+			if(this.perfPath){
+				rotation = Math.atan2(
+					this.perfPath[this.perfPath.length - 1].y -
+					this.perfPath[this.perfPath.length - 2].y,
+					this.perfPath[this.perfPath.length - 1].x -
+					this.perfPath[this.perfPath.length - 2].x
+				) - Math.PI;
+			} else {
+				rotation = Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
+			}
 			this.currentArrow = new GameObject(t_arrows, {
 				x: this.path['end'].x - this.x,
 				y: this.path['end'].y - this.y,
 				_sliderPos: 'end',
-				rotation: this.perfPath
-					? Math.atan2(
-							this.perfPath[this.perfPath.length - 1].y -
-								this.perfPath[this.perfPath.length - 2].y,
-							this.perfPath[this.perfPath.length - 1].x -
-								this.perfPath[this.perfPath.length - 2].x
-					) - Math.PI
-					: Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI
+				rotation: rotation
 			});
 			this.currentArrow.anchor.y = 0.5;
 			this.currentArrow.scale.x = osuScale(0.2, 0.2).x;
@@ -550,7 +558,9 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	_playHitSFX(counter) {
-		if (!this.edgeSounds[counter]) return;
+		if (!this.edgeSounds[counter] || this.edgeSounds[counter].length === 0) {
+			console.warn('Does not have enough edge sounds!');
+		}
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].play();
 		}
