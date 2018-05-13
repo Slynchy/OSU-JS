@@ -20,6 +20,7 @@ class Game extends Token {
 		this.scene = new ContainerObject();
 		this._osuFile = osuFile;
 		this.globalVolume = Settings.audioSettings.globalVolume;
+		this._activeSampleIndex = 0;
 
 		this.difficulty = this.activeTrack.data['Difficulty'];
 		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
@@ -82,28 +83,48 @@ class Game extends Token {
 
 		if (props) Object.assign(this, props);
 
-		AudioLoader(
-			'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
-		).then(buffer => {
-			this.__AUDIOCTX = new AudioContext();
-			this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
-			this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
-			this.__AUDIOSRC.buffer = buffer;
+		AssetLoader.LoadAssetsFromAssetList(
+			this._createAssetLoaderObjectFromRequiredFiles(this.activeTrack.data['RequiredFiles'])
+		).then(() => {
+			AudioLoader(
+				'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
+			).then(buffer => {
+				this.__AUDIOCTX = new AudioContext();
+				this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
+				this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
+				this.__AUDIOSRC.buffer = buffer;
 
-			this.__AUDIOSRC.connect(this.__AUDIOGAIN);
-			this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
+				this.__AUDIOSRC.connect(this.__AUDIOGAIN);
+				this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
 
-			this.scoreDisplay.alpha = 1;
-			this.scene.removeChild(loadingText);
-			loadingText = null;
+				this.scoreDisplay.alpha = 1;
+				this.scene.removeChild(loadingText);
+				loadingText = null;
 
-			this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
-			this._createScheduler();
-			this._scheduleHitObjectSpawns();
-			this._scheduleTimingPoints();
-			this._playTrack();
-			this._updateScore();
+				this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
+				this._createScheduler();
+				this._scheduleHitObjectSpawns();
+				this._scheduleTimingPoints();
+				this._playTrack();
+				this._updateScore();
+			});
 		});
+	}
+
+	_createAssetLoaderObjectFromRequiredFiles(reqFiles) {
+		let correctedFiles = {};
+		for (let i = 0; i < reqFiles.length; i++) {
+			// soft-hitclap3.wav
+			// snd_soft_hitclap
+			let key = 'snd_' + reqFiles[i].replace('-', '_');
+			key = key.replace('.wav', '');
+			key = key.replace('.mp3', '');
+			key = key.replace('.ogg', '');
+
+			correctedFiles[key] = 'STYX_HELIX/' + reqFiles[i];
+		}
+		console.log(correctedFiles);
+		return correctedFiles;
 	}
 
 	addScore(score) {
@@ -240,7 +261,11 @@ class Game extends Token {
 		for (let i = 1; i < this.activeTrack.data['TimingPoints'].length; i++) {
 			let current = this.activeTrack.data['TimingPoints'][i];
 
-			this._trackClock.insert(current.offset * 0.001, this._setTimingPointData.bind(this), current);
+			this._trackClock.insert(
+				current.offset * 0.001,
+				this._setTimingPointData.bind(this),
+				current
+			);
 		}
 	}
 
@@ -308,12 +333,21 @@ class Game extends Token {
 
 		for (let k in entry['hitSound']) {
 			if (entry['hitSound'][k] === true || k === 'normal') {
-				let file = ('snd_' + this._activeSampleSet + '_hit' + k).toLowerCase();
+				let file = (
+					'snd_' +
+					(entry['extras']['sampleSet'] === 'auto' ? this._activeSampleSet : entry['extras']['sampleSet']) +
+					'_hit' +
+					k +
+					(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())
+				).toLowerCase();
 
 				if (global.hasOwnProperty(file)) {
 					result.push(global[file]);
 				} else {
-					throw new Error('Hitsound invalid!');
+					file = ('snd_' + this._activeSampleSet + '_hit' + k + '').toLowerCase();
+
+					if (global.hasOwnProperty(file)) result.push(global[file]);
+					else console.error('Hitsound invalid! ' + file);
 				}
 			}
 		}
@@ -326,7 +360,7 @@ class Game extends Token {
 		if (global.hasOwnProperty(file)) {
 			return global[file];
 		} else {
-			throw new Error('Tickersound invalid!');
+			console.error('Hitsound invalid! ' + file);
 		}
 	}
 
@@ -340,7 +374,7 @@ class Game extends Token {
 				if (global.hasOwnProperty(file)) {
 					result.push(global[file]);
 				} else {
-					throw new Error('Hitsound invalid!');
+					console.error('Hitsound invalid! ' + file);
 				}
 			}
 		}
@@ -355,11 +389,20 @@ class Game extends Token {
 			result[i] = [];
 			for (let k in entry['edgeHitsounds'][i]) {
 				if (entry['edgeHitsounds'][i][k] === true || k === 'normal') {
-					let file = ('snd_' + this._activeSampleSet + '_hit' + k).toLowerCase();
+					let file = (
+						'snd_' +
+						(entry['extras']['sampleSet'] === 'auto' ? this._activeSampleSet : entry['extras']['sampleSet']) +
+						'_hit' +
+						k +
+						(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())
+					).toLowerCase();
 					if (global.hasOwnProperty(file)) {
 						result[i].push(global[file]);
 					} else {
-						throw new Error('Hitsound invalid!');
+						file = ('snd_' + this._activeSampleSet + '_hit' + k + '').toLowerCase();
+
+						if (global.hasOwnProperty(file)) result[i].push(global[file]);
+						else console.error('Hitsound invalid! ' + file);
 					}
 				}
 			}
@@ -370,14 +413,15 @@ class Game extends Token {
 
 	_setTimingPointData(tpoint) {
 		let tempTpoint = null;
-		if(tpoint.args) tempTpoint = tpoint.args;
+		if (tpoint.args) tempTpoint = tpoint.args;
 		else tempTpoint = tpoint;
 
 		this._activeMPB = tempTpoint.mpb;
 		this._activeMeter = tempTpoint.meter;
 		this._activeSampleSet = tempTpoint.sampleSet;
+		this._activeSampleIndex = tempTpoint.sampleIndex;
 
-		if (PIXI.sound) PIXI.sound.volumeAll = (tempTpoint.volume * 0.01) * this.globalVolume;
+		if (PIXI.sound) PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * this.globalVolume;
 
 		// todo
 

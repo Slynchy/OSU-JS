@@ -23,7 +23,7 @@ class SliderHitObject extends ContainerObject {
 		this.circleSize = 0;
 		this.repeat = 0;
 		this.mpb = 0;
-		this.edgeSounds = [];
+		this.edgeSounds = null;
 		this.tickerSound = null;
 		this.sliderSound = null;
 		this.comboNumber = 0;
@@ -559,7 +559,7 @@ class SliderHitObject extends ContainerObject {
 
 	_playHitSFX(counter) {
 		if (!this.edgeSounds[counter] || this.edgeSounds[counter].length === 0) {
-			console.warning('Does not have enough edge sounds!');
+			console.warn('Does not have enough edge sounds!');
 		}
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].play();
