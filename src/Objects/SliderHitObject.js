@@ -87,21 +87,25 @@ class SliderHitObject extends ContainerObject {
 
 		this.tickerObjects = [];
 		for (let i = 0; i < this.numberOfTicks; i++) {
+			let x = 0,
+				y = 0;
+			if (this.perfPath) {
+				x = lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1));
+				y = lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1));
+			} else {
+				x =
+					this.perfPath[
+						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+					].x - this.x;
+				y =
+					this.perfPath[
+						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+					].y - this.y;
+			}
+
 			let tempTick = new GameObject(t_white, {
-				x: this.perfPath
-					? this.perfPath[
-							Math.floor(
-								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
-							)
-					  ].x - this.x
-					: lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1)),
-				y: this.perfPath
-					? this.perfPath[
-							Math.floor(
-								this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1))
-							)
-					  ].y - this.y
-					: lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1)),
+				x: x,
+				y: y,
 				width: 10,
 				height: 10
 			});
