@@ -263,7 +263,8 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	expire() {
-		console.warn('expire');
+		if (this.game)
+			this.game.resetCombo();
 		this.destroy();
 	}
 
@@ -529,6 +530,12 @@ class SliderHitObject extends ContainerObject {
 		}
 
 		if (this.game) {
+			if(!this.perfectScore){
+				this.game.resetCombo();
+			} else {
+				this.game.incrementCombo();
+			}
+
 			this.game.addScore(
 				this.game.calculateScore(this.game.difficulty, this.hitTimestamp, this.sliderScores)
 			);

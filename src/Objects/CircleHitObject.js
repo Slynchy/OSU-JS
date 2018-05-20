@@ -19,6 +19,7 @@ class CircleHitObject extends GameObject {
 		this.comboNumber = 0;
 		this.hitSounds = null;
 		Object.assign(this, metadata);
+		this.perfectScore = true;
 
 		this.interactive = true;
 
@@ -90,7 +91,9 @@ class CircleHitObject extends GameObject {
 		let score = this.game.calculateScore(this.game.difficulty, timeOffset);
 		let threshold = this.game.calculateScoreThreshold(timeOffset);
 
-		if (threshold === 300) {
+		this.perfectScore = (threshold > 0);
+
+		if (this.perfectScore) {
 			this.playLargeParticleEffect(this.x, this.y, {
 				color: {
 					start: '#f4ff95',
@@ -102,6 +105,11 @@ class CircleHitObject extends GameObject {
 		}
 
 		if (this.game) {
+			if(!this.perfectScore){
+				this.game.resetCombo();
+			} else {
+				this.game.incrementCombo();
+			}
 			this.game.addScore(score);
 		} else {
 			throw new Error('No game reference on object!');
@@ -123,6 +131,8 @@ class CircleHitObject extends GameObject {
 		this.outline.scale.x = this.outline.scale.y = 3 - 2 * this._progressPreempt;
 
 		if (this.outline.scale.x <= 0) {
+			if (this.game)
+				this.game.resetCombo();
 			this.destroy();
 		}
 	}

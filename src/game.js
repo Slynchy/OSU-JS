@@ -64,10 +64,33 @@ class Game extends Token {
 		this.scoreDisplay.anchor.y = 0;
 		this.scene.addChild(this.scoreDisplay);
 
+		this._currentComboMultiplier = 1;
+		this.comboDisplay = new Text({
+			text: 'x1',
+			alpha: 0,
+			x: Settings.applicationSettings.width / 2,
+			y: 50,
+			anchor: {
+				x: 0.5,
+				y: 0
+			},
+			style: new PIXI.TextStyle({
+				align: 'center',
+				fontSize: osuScale(16),
+				fontFamily: fnt_exo_20_black,
+				fill: '#ff0000'
+			})
+		});
+		this.scene.addChild(this.comboDisplay);
+
 		let loadingText = new Text({
 			text: 'Loading audio file...',
 			x: Settings.applicationSettings.width / 2,
 			y: Settings.applicationSettings.height / 2,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(22),
@@ -75,8 +98,6 @@ class Game extends Token {
 				fill: '#ff0000'
 			})
 		});
-		loadingText.anchor.x = 0.5;
-		loadingText.anchor.y = 0.5;
 		this.scene.addChild(loadingText);
 
 		this._createDeathParticleSpawner();
@@ -100,6 +121,7 @@ class Game extends Token {
 				this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
 
 				this.scoreDisplay.alpha = 1;
+				this.comboDisplay.alpha = 1;
 				this.scene.removeChild(loadingText);
 				loadingText = null;
 
@@ -232,6 +254,10 @@ class Game extends Token {
 		this.scoreDisplay.text = this.score.toString();
 	}
 
+	_updateCombo() {
+		this.comboDisplay.text = "x" + this._currentComboMultiplier.toString();
+	}
+
 	_playTrack() {
 		this.__trackProgress = 0;
 		this._trackClock.start();
@@ -255,7 +281,7 @@ class Game extends Token {
 	}
 
 	calculateScore(difficulty, timestamp, sliderVals) {
-		return Game._calculateScore(difficulty, timestamp, sliderVals);
+		return Game._calculateScore(difficulty, timestamp, sliderVals, this._currentComboMultiplier);
 	}
 
 	static _calculateFadein(difficulty) {
@@ -291,6 +317,16 @@ class Game extends Token {
 		return Game._calculateScoreThreshold(this.difficulty, timestamp);
 	}
 
+	resetCombo(){
+		this._currentComboMultiplier = 1;
+		this._updateCombo();
+	}
+
+	incrementCombo(){
+		this._currentComboMultiplier++;
+		this._updateCombo();
+	}
+
 	/**
 	 *
 	 * @param difficulty
@@ -299,7 +335,7 @@ class Game extends Token {
 	 * @returns {number}
 	 * @private
 	 */
-	static _calculateScore(difficulty, timestamp, sliderVals) {
+	static _calculateScore(difficulty, timestamp, sliderVals, comboMult) {
 		let hitValue = Game._calculateScoreThreshold(difficulty, timestamp);
 
 		if (sliderVals) {
@@ -322,7 +358,6 @@ class Game extends Token {
 			diffMult = 6;
 		}
 
-		let comboMult = 1; // TODO: Implement combo multiplier
 		let modMult = 1;
 
 		return Math.floor(hitValue + hitValue * (comboMult * diffMult * modMult / 25));
