@@ -43,10 +43,21 @@ class Game extends Token {
 			{
 				width: Settings.applicationSettings.width,
 				height: Settings.applicationSettings.height,
-				z: 0
+				z: -5
 			}
 		);
 		this.scene.addChild(this.bg);
+
+		this.customBg = new GameObject(
+			t_black,
+			{
+				alpha: 0,
+				width: Settings.applicationSettings.width,
+				height: Settings.applicationSettings.height,
+				z: -4
+			}
+		);
+		this.scene.addChild(this.customBg);
 
 		this.score = 0;
 		this.scoreDisplay = new Text({
@@ -108,31 +119,77 @@ class Game extends Token {
 
 		AssetLoader.LoadAssetsFromAssetList(
 			this._createAssetLoaderObjectFromRequiredFiles(this.activeTrack.data['RequiredFiles'])
-		).then(() => {
+		).then((resources) => {
 			AudioLoader(
 				'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
 			).then(buffer => {
-				this.__AUDIOCTX = new AudioContext();
-				this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
-				this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
-				this.__AUDIOSRC.buffer = buffer;
+				this.customBg.texture = resources['BG'].texture;
 
-				this.__AUDIOSRC.connect(this.__AUDIOGAIN);
-				this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
+				let self = this;
 
-				this.scoreDisplay.alpha = 1;
-				this.comboDisplay.alpha = 1;
-				this.scene.removeChild(loadingText);
+				self.scene.removeChild(loadingText);
 				loadingText = null;
 
-				this._setTimingPointData(this.activeTrack.data['TimingPoints'][0]);
-				this._createScheduler();
-				this._scheduleHitObjectSpawns();
-				this._scheduleTimingPoints();
-				this._playTrack();
-				this._updateScore();
+				this._easeOutScalarHack(
+					()=>{
+						return self.customBg.alpha;
+					},
+					(x)=>{
+						self.customBg.alpha = x;
+					},
+					0.45,
+					0.3,
+					3000,
+					()=>{
+						self._initializeAudio(buffer);
+
+						self.scoreDisplay.alpha = 1;
+						self.comboDisplay.alpha = 1;
+
+						self._setTimingPointData(self.activeTrack.data['TimingPoints'][0]);
+						self._createScheduler();
+						self._scheduleHitObjectSpawns();
+						self._scheduleTimingPoints();
+						self._playTrack();
+						self._updateScore();
+
+
+					}
+				);
 			});
 		});
+	}
+
+	_easeOutScalarHack(getter, setter, target, speed, duration, onComplete){
+		let hack = {
+			get x(){
+				return getter();
+			},
+			get y(){
+				return 0;
+			},
+			set x(x){
+				setter(x);
+			},
+			set y(y){}
+		};
+
+		Easing.easeOutQuadAsync(
+			hack,
+			{x: target, y: 0},
+			speed,
+			duration,
+			onComplete
+		);
+	}
+
+	_initializeAudio(buffer){
+		this.__AUDIOCTX = new AudioContext();
+		this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
+		this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
+		this.__AUDIOSRC.buffer = buffer;
+		this.__AUDIOSRC.connect(this.__AUDIOGAIN);
+		this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
 	}
 
 	_createDeathParticleSpawner(){
@@ -241,7 +298,7 @@ class Game extends Token {
 
 			correctedFiles[key] = 'STYX_HELIX/' + reqFiles[i];
 		}
-		console.log(correctedFiles);
+		correctedFiles['BG'] = 'STYX_HELIX/BG.jpg';
 		return correctedFiles;
 	}
 
