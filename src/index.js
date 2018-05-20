@@ -47,7 +47,9 @@ const Tokens = (global.Tokens = []);
 
 PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
 const Application = (global.Application = new PIXI.Application(Settings.applicationSettings));
-const EventHandler = (global.EventHandler = new (require('./engine/EventHandler.js'))(Application.ticker));
+const EventHandler = (global.EventHandler = new (require('./engine/EventHandler.js'))(
+	Application.ticker
+));
 Application.renderer.backgroundColor = Settings.applicationSettings.backgroundColor;
 document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
@@ -69,7 +71,7 @@ let resize = function() {
 	Application.view.setAttribute(
 		'style',
 		//__CACHEDCSSSTYLE +
-			' ' +
+		' ' +
 			'-ms-transform: scale(' +
 			scale +
 			'); -webkit-transform: scale3d(' +

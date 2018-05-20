@@ -90,11 +90,11 @@ class CircleHitObject extends GameObject {
 		let score = this.game.calculateScore(this.game.difficulty, timeOffset);
 		let threshold = this.game.calculateScoreThreshold(timeOffset);
 
-		if(threshold === 300){
+		if (threshold === 300) {
 			this.playLargeParticleEffect(this.x, this.y, {
 				color: {
-					"start": '#f4ff95',
-					"end": '#ffd748'
+					start: '#f4ff95',
+					end: '#ffd748'
 				}
 			});
 		} else {

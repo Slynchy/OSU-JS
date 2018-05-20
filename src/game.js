@@ -128,79 +128,83 @@ class Game extends Token {
 
 	_spawnLargeExplosionParticle(x,y,props){
 		let config = {
-			"alpha": {
-				"start": 0.74,
-				"end": 0
+			alpha: {
+				start: 0.74,
+				end: 0
 			},
-			"scale": {
-				"start": 0.7,
-				"end": 0.1,
-				"minimumScaleMultiplier": 1
+			scale: {
+				start: 0.7,
+				end: 0.1,
+				minimumScaleMultiplier: 1
 			},
-			"color": {
-				"start": '#e4f9ff',
-				"end": '#3fcbff'
+			color: {
+				start: '#e4f9ff',
+				end: '#3fcbff'
 			},
-			"speed": {
-				"start": 400,
-				"end": 0,
-				"minimumSpeedMultiplier": 1
+			speed: {
+				start: 400,
+				end: 0,
+				minimumSpeedMultiplier: 1
 			},
-			"acceleration": {
-				"x": 0,
-				"y": 0
+			acceleration: {
+				x: 0,
+				y: 0
 			},
-			"maxSpeed": 0,
-			"startRotation": {
-				"min": 0,
-				"max": 360
+			maxSpeed: 0,
+			startRotation: {
+				min: 0,
+				max: 360
 			},
-			"noRotation": false,
-			"rotationSpeed": {
-				"min": 0,
-				"max": 200
+			noRotation: false,
+			rotationSpeed: {
+				min: 0,
+				max: 200
 			},
-			"lifetime": {
-				"min": 0.5,
-				"max": 1
+			lifetime: {
+				min: 0.5,
+				max: 1
 			},
-			"blendMode": "normal",
-			"ease": [
+			blendMode: 'normal',
+			ease: [
 				{
-					"s": 0,
-					"cp": 0.329,
-					"e": 0.548
+					s: 0,
+					cp: 0.329,
+					e: 0.548
 				},
 				{
-					"s": 0.548,
-					"cp": 0.767,
-					"e": 0.876
+					s: 0.548,
+					cp: 0.767,
+					e: 0.876
 				},
 				{
-					"s": 0.876,
-					"cp": 0.985,
-					"e": 1
+					s: 0.876,
+					cp: 0.985,
+					e: 1
 				}
 			],
-			"frequency": 0.001,
-			"emitterLifetime": 0.1,
-			"maxParticles": 50,
-			"pos": {
-				"x": x,
-				"y": y
+			frequency: 0.001,
+			emitterLifetime: 0.1,
+			maxParticles: 50,
+			pos: {
+				x: x,
+				y: y
 			},
-			"addAtBack": true,
-			"spawnType": "point"
+			addAtBack: true,
+			spawnType: 'point'
 		};
 
 		config = Object.assign(config, props);
 
 		let particleEmitter = new __PIXIPARTICLES.Emitter(this.emitterContainer, t_spark, config);
-		let index = (this._activeEmitters.push(particleEmitter)) - 1;
-		EventHandler.ScheduleEvent(()=>{
+		let index = this._activeEmitters.push(particleEmitter) - 1;
+		EventHandler.ScheduleEvent(
+			() => {
 			particleEmitter.destroy();
 			this._activeEmitters[index] = null;
-		}, 500, false);
+			},
+			500,
+			false
+		);
 	}
 
 	_createAssetLoaderObjectFromRequiredFiles(reqFiles) {
@@ -441,7 +445,9 @@ class Game extends Token {
 			if (entry['hitSound'][k] === true || k === 'normal') {
 				let file = (
 					'snd_' +
-					(entry['extras']['sampleSet'] === 'auto' ? this._activeSampleSet : entry['extras']['sampleSet']) +
+					(entry['extras']['sampleSet'] === 'auto'
+						? this._activeSampleSet
+						: entry['extras']['sampleSet']) +
 					'_hit' +
 					k +
 					(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())
@@ -497,7 +503,9 @@ class Game extends Token {
 				if (entry['edgeHitsounds'][i][k] === true || k === 'normal') {
 					let file = (
 						'snd_' +
-						(entry['extras']['sampleSet'] === 'auto' ? this._activeSampleSet : entry['extras']['sampleSet']) +
+						(entry['extras']['sampleSet'] === 'auto'
+							? this._activeSampleSet
+							: entry['extras']['sampleSet']) +
 						'_hit' +
 						k +
 						(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())

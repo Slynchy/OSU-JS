@@ -32,8 +32,7 @@ class SliderHitObject extends ContainerObject {
 
 		this.perfectScore = true;
 
-		if(!this.playLargeParticleEffect)
-			this.playLargeParticleEffect = ()=>{};
+		if (!this.playLargeParticleEffect) this.playLargeParticleEffect = () => {};
 
 		this.hitTimestamp = 0;
 		this.sliderScores = [];
@@ -126,15 +125,17 @@ class SliderHitObject extends ContainerObject {
 
 		if (this.repeat > 1) {
 			let rotation;
-			if(this.perfPath){
-				rotation = Math.atan2(
-					this.perfPath[this.perfPath.length - 1].y -
-					this.perfPath[this.perfPath.length - 2].y,
-					this.perfPath[this.perfPath.length - 1].x -
-					this.perfPath[this.perfPath.length - 2].x
-				) - Math.PI;
+			if (this.perfPath) {
+				rotation =
+					Math.atan2(
+						this.perfPath[this.perfPath.length - 1].y -
+							this.perfPath[this.perfPath.length - 2].y,
+						this.perfPath[this.perfPath.length - 1].x -
+							this.perfPath[this.perfPath.length - 2].x
+					) - Math.PI;
 			} else {
-				rotation = Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
+				rotation =
+					Math.atan2(this.path['end'].y - this.y, this.path['end'].x - this.x) - Math.PI;
 			}
 			this.currentArrow = new GameObject(t_arrows, {
 				x: this.path['end'].x - this.x,
@@ -516,11 +517,11 @@ class SliderHitObject extends ContainerObject {
 	score() {
 		this.sliderScores.push(30);
 
-		if(this.perfectScore){
+		if (this.perfectScore) {
 			this.playLargeParticleEffect(this.target.x + this.x, this.target.y + this.y, {
 				color: {
-					"start": '#f4ff95',
-					"end": '#ffd748'
+					start: '#f4ff95',
+					end: '#ffd748'
 				}
 			});
 		} else {
@@ -584,7 +585,7 @@ class SliderHitObject extends ContainerObject {
 			console.warn('Does not have enough edge sounds!');
 		}
 
-		if(!this.edgeSounds[counter]) return;
+		if (!this.edgeSounds[counter]) return;
 
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].play();
