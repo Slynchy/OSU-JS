@@ -98,12 +98,7 @@ class CircleHitObject extends GameObject {
 				}
 			});
 		} else {
-			this.playLargeParticleEffect(this.x, this.y, {
-				color: {
-					"start": '#e4f9ff',
-					"end": '#3fcbff'
-				}
-			});
+			this.playLargeParticleEffect(this.x, this.y, {});
 		}
 
 		if (this.game) {

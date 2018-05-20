@@ -30,6 +30,8 @@ class SliderHitObject extends ContainerObject {
 		this.type = type;
 		Object.assign(this, metadata);
 
+		this.perfectScore = true;
+
 		if(!this.playLargeParticleEffect)
 			this.playLargeParticleEffect = ()=>{};
 
@@ -300,6 +302,8 @@ class SliderHitObject extends ContainerObject {
 					if (this.isPointerOver() === true) {
 						this._playHitSFX(this._repeatCounter + 1);
 						this.sliderScores.push(30);
+					} else {
+						this.perfectScore = false;
 					}
 					this.score();
 					return;
@@ -309,6 +313,8 @@ class SliderHitObject extends ContainerObject {
 					if (this.isPointerOver() === true) {
 						this._playHitSFX(this._repeatCounter);
 						this.sliderScores.push(30);
+					} else {
+						this.perfectScore = false;
 					}
 				}
 			}
@@ -336,6 +342,8 @@ class SliderHitObject extends ContainerObject {
 					if (this.isPointerOver() === true) {
 						this.sliderScores.push(10);
 						if (this.tickerSound) this.tickerSound.play();
+					} else {
+						this.perfectScore = false;
 					}
 				}
 			}
@@ -508,7 +516,16 @@ class SliderHitObject extends ContainerObject {
 	score() {
 		this.sliderScores.push(30);
 
-		this.playLargeParticleEffect(this.target.x + this.x, this.target.y + this.y);
+		if(this.perfectScore){
+			this.playLargeParticleEffect(this.target.x + this.x, this.target.y + this.y, {
+				color: {
+					"start": '#f4ff95',
+					"end": '#ffd748'
+				}
+			});
+		} else {
+			this.playLargeParticleEffect(this.target.x + this.x, this.target.y + this.y);
+		}
 
 		if (this.game) {
 			this.game.addScore(
