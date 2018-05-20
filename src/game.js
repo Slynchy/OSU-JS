@@ -79,6 +79,8 @@ class Game extends Token {
 		loadingText.anchor.y = 0.5;
 		this.scene.addChild(loadingText);
 
+		this._createDeathParticleSpawner();
+
 		Application.stage.addChild(this.scene);
 
 		if (props) Object.assign(this, props);
@@ -109,6 +111,96 @@ class Game extends Token {
 				this._updateScore();
 			});
 		});
+	}
+
+	_createDeathParticleSpawner(){
+		this.emitterContainer = new PIXI.particles.ParticleContainer();
+		this._activeEmitters = [];
+		this.emitterContainer.setProperties({
+			scale: true,
+			position: true,
+			rotation: true,
+			uvs: true,
+			alpha: true
+		});
+		this.scene.addChild(this.emitterContainer);
+	}
+
+	_spawnLargeExplosionParticle(x,y,props){
+		let config = {
+			"alpha": {
+				"start": 0.74,
+				"end": 0
+			},
+			"scale": {
+				"start": 0.7,
+				"end": 0.1,
+				"minimumScaleMultiplier": 1
+			},
+			"color": {
+				"start": '#e4f9ff',
+				"end": '#3fcbff'
+			},
+			"speed": {
+				"start": 400,
+				"end": 0,
+				"minimumSpeedMultiplier": 1
+			},
+			"acceleration": {
+				"x": 0,
+				"y": 0
+			},
+			"maxSpeed": 0,
+			"startRotation": {
+				"min": 0,
+				"max": 360
+			},
+			"noRotation": false,
+			"rotationSpeed": {
+				"min": 0,
+				"max": 200
+			},
+			"lifetime": {
+				"min": 0.5,
+				"max": 1
+			},
+			"blendMode": "normal",
+			"ease": [
+				{
+					"s": 0,
+					"cp": 0.329,
+					"e": 0.548
+				},
+				{
+					"s": 0.548,
+					"cp": 0.767,
+					"e": 0.876
+				},
+				{
+					"s": 0.876,
+					"cp": 0.985,
+					"e": 1
+				}
+			],
+			"frequency": 0.001,
+			"emitterLifetime": 0.1,
+			"maxParticles": 50,
+			"pos": {
+				"x": x,
+				"y": y
+			},
+			"addAtBack": true,
+			"spawnType": "point"
+		};
+
+		config = Object.assign(config, props);
+
+		let particleEmitter = new __PIXIPARTICLES.Emitter(this.emitterContainer, t_spark, config);
+		let index = (this._activeEmitters.push(particleEmitter)) - 1;
+		EventHandler.ScheduleEvent(()=>{
+			particleEmitter.destroy();
+			this._activeEmitters[index] = null;
+		}, 500, false);
 	}
 
 	_createAssetLoaderObjectFromRequiredFiles(reqFiles) {
@@ -176,6 +268,25 @@ class Game extends Token {
 		throw new Error('AR not a number!');
 	}
 
+	static _calculateScoreThreshold(difficulty, timestamp){
+		let OD = difficulty['OverallDifficulty'];
+		if (timestamp < 0) timestamp = Math.abs(timestamp);
+
+		if (timestamp < 50 + 30 * (5 - OD) / 5) {
+			return 300;
+		} else if (timestamp < 100 + 40 * (5 - OD) / 5) {
+			return 100;
+		} else if (timestamp < 50 + 30 * (5 - OD) / 5) {
+			return 50;
+		} else {
+			return 0;
+		}
+	}
+
+	calculateScoreThreshold(timestamp){
+		return Game._calculateScoreThreshold(this.difficulty, timestamp);
+	}
+
 	/**
 	 *
 	 * @param difficulty
@@ -185,18 +296,7 @@ class Game extends Token {
 	 * @private
 	 */
 	static _calculateScore(difficulty, timestamp, sliderVals) {
-		let OD = difficulty['OverallDifficulty'];
-
-		if (timestamp < 0) timestamp = Math.abs(timestamp);
-
-		let hitValue = 0;
-		if (timestamp < 50 + 30 * (5 - OD) / 5) {
-			hitValue = 300;
-		} else if (timestamp < 100 + 40 * (5 - OD) / 5) {
-			hitValue = 100;
-		} else if (timestamp < 50 + 30 * (5 - OD) / 5) {
-			hitValue = 50;
-		}
+		let hitValue = Game._calculateScoreThreshold(difficulty, timestamp);
 
 		if (sliderVals) {
 			for (let i = 0; i < sliderVals.length; i++) {
@@ -299,7 +399,10 @@ class Game extends Token {
 					duration:
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
-						this._activeMPB
+						this._activeMPB,
+					playLargeParticleEffect: (x,y,color)=>{
+						this._spawnLargeExplosionParticle(x,y,color);
+					}
 				},
 				{ game: this }
 			)
@@ -321,7 +424,10 @@ class Game extends Token {
 					preempt: this._preempt,
 					comboNumber: ++this._currentComboCount,
 					circleSize: this._circleSize,
-					hitSounds: this._getHitSound(current)
+					hitSounds: this._getHitSound(current),
+					playLargeParticleEffect: (x,y,color)=>{
+						this._spawnLargeExplosionParticle(x,y,color);
+					}
 				},
 				{ game: this }
 			)
@@ -465,6 +571,12 @@ class Game extends Token {
 	endStep(delta) {
 		'use strict';
 		super.endStep(delta);
+
+		for(let i = 0; i < this._activeEmitters.length; i++){
+			if(this._activeEmitters[i]){
+				this._activeEmitters[i].update(delta * 0.001);
+			}
+		}
 
 		if (this.scene) this.scene.endStep(delta);
 	}

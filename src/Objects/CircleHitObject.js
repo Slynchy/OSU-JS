@@ -88,6 +88,23 @@ class CircleHitObject extends GameObject {
 		// if timeOffset is negative it's fine
 
 		let score = this.game.calculateScore(this.game.difficulty, timeOffset);
+		let threshold = this.game.calculateScoreThreshold(timeOffset);
+
+		if(threshold === 300){
+			this.playLargeParticleEffect(this.x, this.y, {
+				color: {
+					"start": '#f4ff95',
+					"end": '#ffd748'
+				}
+			});
+		} else {
+			this.playLargeParticleEffect(this.x, this.y, {
+				color: {
+					"start": '#e4f9ff',
+					"end": '#3fcbff'
+				}
+			});
+		}
 
 		if (this.game) {
 			this.game.addScore(score);

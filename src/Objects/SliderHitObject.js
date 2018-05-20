@@ -30,6 +30,9 @@ class SliderHitObject extends ContainerObject {
 		this.type = type;
 		Object.assign(this, metadata);
 
+		if(!this.playLargeParticleEffect)
+			this.playLargeParticleEffect = ()=>{};
+
 		this.hitTimestamp = 0;
 		this.sliderScores = [];
 
@@ -505,6 +508,8 @@ class SliderHitObject extends ContainerObject {
 	score() {
 		this.sliderScores.push(30);
 
+		this.playLargeParticleEffect(this.target.x + this.x, this.target.y + this.y);
+
 		if (this.game) {
 			this.game.addScore(
 				this.game.calculateScore(this.game.difficulty, this.hitTimestamp, this.sliderScores)
@@ -561,6 +566,9 @@ class SliderHitObject extends ContainerObject {
 		if (!this.edgeSounds[counter] || this.edgeSounds[counter].length === 0) {
 			console.warn('Does not have enough edge sounds!');
 		}
+
+		if(!this.edgeSounds[counter]) return;
+
 		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
 			this.edgeSounds[counter][i].play();
 		}
@@ -590,14 +598,6 @@ class SliderHitObject extends ContainerObject {
 
 	_handlePointerMove(ev) {
 		if (!this.isPointerDown()) return;
-
-		// let a = this.x + this.target.x - ev.data.global.x;
-		// let b = this.y + this.target.y - ev.data.global.y;
-		// let dist = Math.sqrt(a * a + b * b);
-		// if (dist > this.circleSize) {
-		// 	this.expire();
-		// 	return;
-		// }
 
 		let delta = {
 			x: this._pointerDown.x - ev.data.global.x,
