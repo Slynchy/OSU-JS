@@ -68,7 +68,7 @@ let resize = function() {
 
 	Application.view.setAttribute(
 		'style',
-		__CACHEDCSSSTYLE +
+		//__CACHEDCSSSTYLE +
 			' ' +
 			'-ms-transform: scale(' +
 			scale +
