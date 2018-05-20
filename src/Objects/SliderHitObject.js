@@ -89,7 +89,7 @@ class SliderHitObject extends ContainerObject {
 		for (let i = 0; i < this.numberOfTicks; i++) {
 			let x = 0,
 				y = 0;
-			if (this.perfPath) {
+			if (!this.perfPath) {
 				x = lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1));
 				y = lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1));
 			} else {
