@@ -64,7 +64,6 @@ class Settings {
 			t_whiteCircle: 'white_circle.png',
 			t_redbg9s: 'redbg_9slice.png',
 			t_circleOutline: 'circle_outline.png',
-			snd_hitclap: 'STYX_HELIX/soft-hitclap3.wav',
 
 			snd_drum_hitclap: 'defaultAssets/drum-hitclap.wav',
 			snd_drum_hitfinish: 'defaultAssets/drum-hitfinish.wav',
@@ -92,10 +91,14 @@ class Settings {
 
 			t_circle_glow: 'circle_glow.png',
 			t_arrows: 'arrows.png',
-			t_spark: 'spark.png',
-
-			STYX_HELIX: 'STYX_HELIX/STYX_HELIX.osu'
+			t_spark: 'spark.png'
 		};
+
+		this.osuTracks = [
+			"WAKE_ME_UP",
+			"STYX_HELIX",
+			"HANA_NO_IRO"
+		];
 
 		this.Leaderboards = {
 			leaderboard_names: [],

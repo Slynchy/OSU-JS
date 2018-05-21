@@ -2,6 +2,8 @@
     (/・ω・)/
  */
 
+global._SELECTED_OSU_FILE = "HANA_NO_IRO";
+
 import './styles/app.css';
 import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
 global.fnt_exo_20_black = fnt_exo_20_black;

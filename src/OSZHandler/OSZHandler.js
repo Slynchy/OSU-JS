@@ -21,11 +21,11 @@ class OSZHandler {
 
 			AssetLoader.LoadAssetsFromAssetList({
 				//STYX_HELIX_MP3: 'STYX_HELIX/' + osujson['General']['AudioFilename'],
-				STYX_HELIX_BG: 'STYX_HELIX/BG.jpg'
+				//STYX_HELIX_BG: 'STYX_HELIX/BG.jpg'
 			})
 				.then(resources => {
 					result.track = null; //STYX_HELIX_MP3;
-					result.bg = STYX_HELIX_BG;
+					//result.bg = STYX_HELIX_BG;
 					result.data = osujson;
 					resolve(result);
 				})

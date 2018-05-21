@@ -72,9 +72,26 @@ class FlowController {
 
 	finishedLoading() {
 		'use strict';
-		this.currentAction = this.waitForOsuFile;
+		let osuFiles = {};
+		for(let k in Settings.osuTracks){
+			osuFiles[Settings.osuTracks[k]] = ("tracks/" + Settings.osuTracks[k] + "/" + Settings.osuTracks[k] + ".osu");
+		}
 
-		osujson.ParseOSUFileAsync(GetOSUFile('STYX_HELIX')).then(output => {
+		AssetLoader.LoadAssetsFromAssetList(osuFiles).then(
+			() => {
+				this.currentAction = this.finishedLoadingOsuFiles;
+				console.log('[FlowController] Finished loading osu files');
+			},
+			err => {
+				console.error(err);
+			}
+		);
+
+		this.currentAction = this.waitForOsuFile;
+	}
+
+	finishedLoadingOsuFiles(){
+		osujson.ParseOSUFileAsync(GetOSUFile(_SELECTED_OSU_FILE)).then(output => {
 			this._osuFile = output;
 			OSZHandler.HandleOSUFile(output).then(result => {
 				this._osuFile = result;
@@ -82,6 +99,7 @@ class FlowController {
 				this.currentAction = this.startGame;
 			});
 		});
+		this.currentAction = this.waitForOsuFile;
 	}
 
 	waitForOsuFile() {}

@@ -121,8 +121,9 @@ class Game extends Token {
 			this._createAssetLoaderObjectFromRequiredFiles(this.activeTrack.data['RequiredFiles'])
 		).then((resources) => {
 			AudioLoader(
-				'./assets/STYX_HELIX/' + this.activeTrack.data['General']['AudioFilename']
+				'./assets/tracks/'+ _SELECTED_OSU_FILE +'/' + this.activeTrack.data['General']['AudioFilename']
 			).then(buffer => {
+				if(resources['BG'])
 				this.customBg.texture = resources['BG'].texture;
 
 				let self = this;
@@ -296,9 +297,9 @@ class Game extends Token {
 			key = key.replace('.mp3', '');
 			key = key.replace('.ogg', '');
 
-			correctedFiles[key] = 'STYX_HELIX/' + reqFiles[i];
+			correctedFiles[key] = 'tracks/' + _SELECTED_OSU_FILE + '/' + reqFiles[i];
 		}
-		correctedFiles['BG'] = 'STYX_HELIX/BG.jpg';
+		correctedFiles['BG'] = 'tracks/' + _SELECTED_OSU_FILE + '/BG.jpg';
 		return correctedFiles;
 	}
 
@@ -475,6 +476,11 @@ class Game extends Token {
 			this._currentComboCount = 0;
 		}
 
+		let sampleSet = this._activeSampleSet;
+		if(current['extras'] && current['extras']['sampleSet'] && current['extras']['sampleSet'] !== 'auto'){
+			sampleSet = (current['extras']['sampleSet']);
+		}
+
 		this.scene.addChild(
 			new SliderHitObject(
 				pos.x,
@@ -492,6 +498,12 @@ class Game extends Token {
 					tickerSound: this._getTickerSound(),
 					sliderSound: this._getSliderSound(current),
 					edgeSounds: this._getEdgeHitSounds(current),
+					defaultSound: global[(
+						'snd_' +
+						sampleSet +
+						'_hit' +
+						'normal')
+						.toLowerCase()],
 					duration:
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
@@ -535,11 +547,13 @@ class Game extends Token {
 
 		for (let k in entry['hitSound']) {
 			if (entry['hitSound'][k] === true || k === 'normal') {
+				let sampleSet = this._activeSampleSet;
+				if(entry['extras'] && entry['extras']['sampleSet'] && entry['extras']['sampleSet'] !== 'auto'){
+					sampleSet = (entry['extras']['sampleSet']);
+				}
 				let file = (
 					'snd_' +
-					(entry['extras']['sampleSet'] === 'auto'
-						? this._activeSampleSet
-						: entry['extras']['sampleSet']) +
+					sampleSet +
 					'_hit' +
 					k +
 					(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())
@@ -589,15 +603,18 @@ class Game extends Token {
 	_getEdgeHitSounds(entry) {
 		let result = [];
 
+		let sampleSet = this._activeSampleSet;
+		if(entry['extras'] && entry['extras']['sampleSet'] && entry['extras']['sampleSet'] !== 'auto'){
+			sampleSet = (entry['extras']['sampleSet']);
+		}
+
 		for (let i in entry['edgeHitsounds']) {
 			result[i] = [];
 			for (let k in entry['edgeHitsounds'][i]) {
-				if (entry['edgeHitsounds'][i][k] === true || k === 'normal') {
+				if (entry['edgeHitsounds'][i][k] === true && k !== 'normal') {
 					let file = (
 						'snd_' +
-						(entry['extras']['sampleSet'] === 'auto'
-							? this._activeSampleSet
-							: entry['extras']['sampleSet']) +
+						sampleSet +
 						'_hit' +
 						k +
 						(this._activeSampleIndex <= 1 ? '' : this._activeSampleIndex.toString())
