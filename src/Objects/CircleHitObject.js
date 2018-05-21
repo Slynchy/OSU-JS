@@ -56,7 +56,11 @@ class CircleHitObject extends GameObject {
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(54)
-			})
+			}),
+			anchor: {
+				x:0.5,
+				y:0.5
+			}
 		});
 		this.addChild(this.comboText);
 
