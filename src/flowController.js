@@ -35,8 +35,65 @@ class FlowController {
 	 * Every implementation of FlowController MUST have an entry() function
 	 */
 	entry() {
-		this.currentAction = this.startMainMenu;
+		this.currentAction = this.hackilyInitFacebook;
 	}
+
+	hackilyInitFacebook(){
+		//todo: implement properly
+		let self = this;
+
+		if(window['FBInstant']){
+			this.currentAction = this.waitForFBInstant;
+			FBInstant.initializeAsync()
+				.then(function () {
+					console.log("[flowController] initializeAsync resolved");
+					// console.log("[flowController] Initializing ad api");
+					// AdAPI.initialize(function () {
+					// 	console.log("[flowController] AdAPI initialized");
+					// 	self.currentAction = self.initializeSaveData;
+					// });
+					FBInstant.startGameAsync()
+						.then(() => {
+							global.FBINSTANT_INFO = {
+								contextId: FBInstant.context.getID(),
+								contextType: FBInstant.context.getType(),
+								isSoloContext: (FBInstant.context.getType() === "SOLO"),
+								context: FBInstant.context,
+								players: null,
+								contextLeaderboard: null,
+								playerInfo: {
+									displayName: FBInstant.player.getName(),
+									id: FBInstant.player.getID(),
+								}
+							};
+
+							if(global.FBINSTANT_INFO.isSoloContext){
+								self.currentAction = self.startMainMenu;
+							} else {
+								FBInstant.context.getPlayersAsync().then((players)=>{
+									global.FBINSTANT_INFO.players = players;
+									self.currentAction = self.startMainMenu;
+								})
+									.catch((err)=>{
+										console.error(err);
+										self.currentAction = self.startMainMenu;
+									});
+							}
+
+						})
+						.catch((err)=>{
+							console.error(err);
+						});
+				})
+				.catch(err => {
+					console.error(err);
+				})
+		} else {
+			this.currentAction = this.startMainMenu;
+		}
+	}
+
+	waitForFBInstant(){}
 
 	startMainMenu() {
 		this.currentAction = this.onMainMenu;

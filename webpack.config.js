@@ -52,9 +52,14 @@ publicPath = '';
 //Development plugin
 plugins.push(new webpack.HotModuleReplacementPlugin());
 plugins.push(new webpack.NamedModulesPlugin());
-plugins.push(new CopyWebpackPlugin([{
-    from: 'src/assets', to: 'assets'
-}]));
+plugins.push(new CopyWebpackPlugin([
+    {
+        from: 'src/assets', to: 'assets'
+    },
+    {
+        from: 'src/fbapp-config.json', to: 'fbapp-config.json'
+    }
+]));
 
 module.exports = {
     entry: ['babel-polyfill', './src/index.js'],

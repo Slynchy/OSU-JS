@@ -9,6 +9,7 @@ import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
 global.fnt_exo_20_black = fnt_exo_20_black;
 const PIXI = (global.PIXI = require('pixi.js'));
 const PIXISND = (global.PIXISND = require('pixi-sound'));
+const PIXIPART = (global.PIXIPART = require('./pixi-particles.js'));
 
 require('./engine/MiscPolyfills.js');
 require('./vector.js');
