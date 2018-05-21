@@ -24,8 +24,8 @@ class Settings {
 
 		this.applicationSettings = {
 			// REQUIRED
-			width: 1024,
-			height: 768,
+			width: 1350,
+			height: 720,
 			sharedTicker: true,
 			autoStart: false,
 			backgroundColor: 0x000000,
@@ -112,7 +112,11 @@ class Settings {
 		};
 
 		this.osuDefaults = {
-			ApproachRate: 3
+			ApproachRate: 3,
+			Padding: {
+				x: -256,
+				y: -100
+			}
 		};
 
 		this.flowSettings = {

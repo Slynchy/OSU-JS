@@ -17,16 +17,16 @@ global.osuScale = function(x, y) {
 	if (typeof y === 'undefined') {
 		if (typeof x === 'object') {
 			return {
-				x: x.x * (Settings.applicationSettings.width / 512),
-				y: x.y * (Settings.applicationSettings.height / 384)
+				x: x.x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512),
+				y: x.y * ((Settings.applicationSettings.height + Settings.osuDefaults.Padding.y) / 384)
 			};
 		} else {
-			return x * (Settings.applicationSettings.width / 512);
+			return x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512);
 		}
 	} else {
 		return {
-			x: x * (Settings.applicationSettings.width / 512),
-			y: y * (Settings.applicationSettings.height / 384)
+			x: x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512),
+			y: y * ((Settings.applicationSettings.height + Settings.osuDefaults.Padding.y) / 384)
 		};
 	}
 };

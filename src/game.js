@@ -22,6 +22,11 @@ class Game extends Token {
 		this.globalVolume = Settings.audioSettings.globalVolume;
 		this._activeSampleIndex = 0;
 
+		this._offset = {
+			x: -(Settings.osuDefaults.Padding.x * 0.5),
+			y: -(Settings.osuDefaults.Padding.y * 0.5),
+		};
+
 		this.difficulty = this.activeTrack.data['Difficulty'];
 		this.overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
 		this._fadein = Game._calculateFadein(this.activeTrack.data['Difficulty']);
@@ -483,10 +488,11 @@ class Game extends Token {
 
 		this.scene.addChild(
 			new SliderHitObject(
-				pos.x,
-				pos.y,
+				pos.x + this._offset.x,
+				pos.y + this._offset.y,
 				current.type,
 				{
+					offset: this._offset,
 					fadein: this._fadein,
 					preempt: this._preempt,
 					path: current.path,
@@ -524,10 +530,11 @@ class Game extends Token {
 		}
 		this.scene.addChild(
 			new CircleHitObject(
-				pos.x,
-				pos.y,
+				pos.x + this._offset.x,
+				pos.y + this._offset.y,
 				current.type,
 				{
+					offset: this._offset,
 					fadein: this._fadein,
 					preempt: this._preempt,
 					comboNumber: ++this._currentComboCount,

@@ -12,6 +12,16 @@ class SliderHitObject extends ContainerObject {
 		};
 	}
 
+	_applyOffset(input){
+		if(input.x){
+			input.x += this.offset.x;
+		}
+		if(input.y){
+			input.y += this.offset.y;
+		}
+		return input;
+	}
+
 	constructor(x, y, type, metadata, props) {
 		super({});
 
@@ -28,6 +38,10 @@ class SliderHitObject extends ContainerObject {
 		this.sliderSound = null;
 		this.comboNumber = 0;
 		this.type = type;
+		this.offset = {
+			x: 0,
+			y: 0
+		}
 		Object.assign(this, metadata);
 
 		this.perfectScore = true;
@@ -38,9 +52,11 @@ class SliderHitObject extends ContainerObject {
 		this.sliderScores = [];
 
 		this.path['end'] = osuScale(this.path['end']);
+		this._applyOffset(this.path['end']);
 
 		if (this.path.sliderType === 'perfect') {
 			this.path['passthrough'] = osuScale(this.path['passthrough']);
+			this._applyOffset(this.path['passthrough']);
 			this.perfPath = CircularArcApproximator.CreateArc(
 				{ x: this.x, y: this.y },
 				{ x: this.path['passthrough'].x, y: this.path['passthrough'].y },
