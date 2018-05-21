@@ -590,13 +590,13 @@ class SliderHitObject extends ContainerObject {
 	_playHitSFX(counter) {
 		if (!this.edgeSounds[counter] || this.edgeSounds[counter].length === 0) {
 			console.warn('Does not have enough edge sounds!');
+		} else {
+			for (let i = 0; i < this.edgeSounds[counter].length; i++) {
+				this.edgeSounds[counter][i].play();
+			}
 		}
 
-		if (!this.edgeSounds[counter]) return;
-
-		for (let i = 0; i < this.edgeSounds[counter].length; i++) {
-			this.edgeSounds[counter][i].play();
-		}
+		this.defaultSound.play();
 	}
 
 	_playSliderSFX() {
