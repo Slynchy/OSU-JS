@@ -24,16 +24,23 @@ const rules = [
         test: /\.(txt|osu)$/,
         use: 'raw-loader'
     },
-    {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: ['babel-loader']
-    },
-    {
-        test: /\.(js)$/,
-        exclude: /node_modules/,
-        use: ['babel-loader', 'eslint-loader']
-    },
+	{
+		test: /\.(js|jsx)$/,
+		exclude: /node_modules/,
+		loader: 'babel-loader',
+		options: {
+			presets: ['es2015'],
+		}
+	},
+	{
+		test: /\.(js)$/,
+		exclude: /node_modules/,
+		loader: 'eslint-loader',
+		enforce: 'pre',
+		options: {
+			fix: true
+		}
+	},
 	{
 		test: /\.ttf$/,
 		use: [

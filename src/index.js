@@ -2,7 +2,7 @@
     (/・ω・)/
  */
 
-global._SELECTED_OSU_FILE = "STYX_HELIX";
+global._SELECTED_OSU_FILE = "WAKE_ME_UP";
 
 import './styles/app.css';
 import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
@@ -39,7 +39,7 @@ global.GetOSUFile = function(name) {
 require('./engine/FBInstant.js');
 
 const Settings = (global.Settings = require('./Settings/Settings.js'));
-const Leaderboards = (global.Leaderboards = require('./engine/gamesparks/FBLeaderboards.js'));
+const Leaderboards = (global.Leaderboards = require('./engine/FBLeaderboards.js'));
 const AdAPI = (global.AdAPI = require('./engine/Adverts.js'));
 const SaveData = (global.SaveData = require('./engine/SaveData.js'));
 const AudioAPI = (global.AudioAPI = require('./engine/Audio.js'));
