@@ -168,7 +168,8 @@ class SliderHitObject extends ContainerObject {
 		this.target = new GameObject(t_whiteCircle, {
 			width: this.circleSize,
 			height: this.circleSize,
-			interactive: true
+			interactive: true,
+			interactiveChildren: false
 		});
 		this.target.on('pointerdown', this._handlePointerDown.bind(this));
 		this.target.on('pointerup', this._handlePointerUp.bind(this));

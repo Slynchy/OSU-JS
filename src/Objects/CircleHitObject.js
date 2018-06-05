@@ -22,6 +22,7 @@ class CircleHitObject extends GameObject {
 		this.perfectScore = true;
 
 		this.interactive = true;
+		this.interactiveChildren = false;
 
 		this.anchor.x = 0.5;
 		this.anchor.y = 0.5;
