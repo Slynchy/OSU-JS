@@ -129,7 +129,7 @@ class Game extends Token {
 				'./assets/tracks/'+ _SELECTED_OSU_FILE +'/' + this.activeTrack.data['General']['AudioFilename']
 			).then(buffer => {
 				if(resources['BG'])
-				this.customBg.texture = resources['BG'].texture;
+					this.customBg.texture = resources['BG'].texture;
 
 				let self = this;
 
@@ -198,7 +198,7 @@ class Game extends Token {
 		this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
 	}
 
-	_createDeathParticleSpawner(){
+	_createDeathParticleSpawner() {
 		this.emitterContainer = new PIXI.particles.ParticleContainer();
 		this._activeEmitters = [];
 		this.emitterContainer.setProperties({
@@ -211,7 +211,7 @@ class Game extends Token {
 		this.scene.addChild(this.emitterContainer);
 	}
 
-	_spawnLargeExplosionParticle(x,y,props){
+	_spawnLargeExplosionParticle(x, y, props) {
 		let config = {
 			alpha: {
 				start: 0.74,
@@ -284,8 +284,8 @@ class Game extends Token {
 		let index = this._activeEmitters.push(particleEmitter) - 1;
 		EventHandler.ScheduleEvent(
 			() => {
-			particleEmitter.destroy();
-			this._activeEmitters[index] = null;
+				particleEmitter.destroy();
+				this._activeEmitters[index] = null;
 			},
 			500,
 			false
@@ -361,7 +361,7 @@ class Game extends Token {
 		throw new Error('AR not a number!');
 	}
 
-	static _calculateScoreThreshold(difficulty, timestamp){
+	static _calculateScoreThreshold(difficulty, timestamp) {
 		let OD = difficulty['OverallDifficulty'];
 		if (timestamp < 0) timestamp = Math.abs(timestamp);
 
@@ -376,7 +376,7 @@ class Game extends Token {
 		}
 	}
 
-	calculateScoreThreshold(timestamp){
+	calculateScoreThreshold(timestamp) {
 		return Game._calculateScoreThreshold(this.difficulty, timestamp);
 	}
 
@@ -473,7 +473,7 @@ class Game extends Token {
 
 	_spawnSlider(current) {
 		//TODO: fix this hack
-		if (current.path.sliderType === 'bezier') return;
+		//if (current.path.sliderType === 'bezier') return;
 
 		let pos = osuScale(current.x, current.y);
 
@@ -514,8 +514,8 @@ class Game extends Token {
 						current.pixelLength /
 						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
 						this._activeMPB,
-					playLargeParticleEffect: (x,y,color)=>{
-						this._spawnLargeExplosionParticle(x,y,color);
+					playLargeParticleEffect: (x, y, color) => {
+						this._spawnLargeExplosionParticle(x, y, color);
 					}
 				},
 				{ game: this }
@@ -540,8 +540,8 @@ class Game extends Token {
 					comboNumber: ++this._currentComboCount,
 					circleSize: this._circleSize,
 					hitSounds: this._getHitSound(current),
-					playLargeParticleEffect: (x,y,color)=>{
-						this._spawnLargeExplosionParticle(x,y,color);
+					playLargeParticleEffect: (x, y, color) => {
+						this._spawnLargeExplosionParticle(x, y, color);
 					}
 				},
 				{ game: this }
@@ -696,8 +696,8 @@ class Game extends Token {
 		'use strict';
 		super.endStep(delta);
 
-		for(let i = 0; i < this._activeEmitters.length; i++){
-			if(this._activeEmitters[i]){
+		for (let i = 0; i < this._activeEmitters.length; i++) {
+			if (this._activeEmitters[i]) {
 				this._activeEmitters[i].update(delta * 0.001);
 			}
 		}
