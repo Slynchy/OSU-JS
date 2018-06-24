@@ -1,6 +1,8 @@
 let Token = require('../engine/Token.js');
 let Text = require('../engine/Text.js');
 let ContainerObject = require('../engine/ContainerObject.js');
+let ToggleButton = require('../engine/ToggleButton.js');
+let GameObject = require('../engine/GameObject.js');
 
 class MainMenu extends Token {
 	constructor(onClose, props) {
@@ -11,10 +13,27 @@ class MainMenu extends Token {
 
 		this.onClose = onClose;
 
+		this.createUI();
+
+		if (props) Object.assign(this, props);
+	}
+
+	createUI(){
+		this.bg = new GameObject(t_white,{
+			alpha: 0.2,
+			width: Settings.applicationSettings.width,
+			height: Settings.applicationSettings.height,
+		});
+		this.scene.addChild(this.bg);
+
 		this.playButton = new Text({
-			text: 'Click here\nto play!',
+			text: 'Tap here\nto play!',
 			x: Settings.applicationSettings.width / 2,
 			y: Settings.applicationSettings.height / 2,
+			anchor: {
+				x: 0.5,
+				y: 0.5,
+			},
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(22),
@@ -23,12 +42,43 @@ class MainMenu extends Token {
 			}),
 			interactive: true
 		});
-		this.playButton.anchor.x = 0.5;
-		this.playButton.anchor.y = 0.5;
 		this.playButton.on('pointerup', this._onClose.bind(this));
 		this.scene.addChild(this.playButton);
 
-		if (props) Object.assign(this, props);
+		this.portraitLandscapeButton = new ToggleButton(t_button_landscape, t_button_portrait, {
+			x: Settings.applicationSettings.width / 2,
+			y: (Settings.applicationSettings.height / 2) + (Settings.applicationSettings.height / 5),
+			anchor: {
+				x: 0.5,
+				y: 0.5,
+			},
+			onClick: ()=>{
+				Settings.GameSettings.portraitMode = this.portraitLandscapeButton._isInDownstate;
+				console.log(Settings.GameSettings.portraitMode);
+				this.correctUIRotation();
+			}
+		});
+		this.scene.addChild(this.portraitLandscapeButton);
+	}
+
+	correctUIRotation(){
+
+		if(Settings.GameSettings.portraitMode){
+			this.playButton.rotation = -1.571;
+			this.portraitLandscapeButton.rotation = -1.571;
+			this.portraitLandscapeButton.x =
+				(Settings.applicationSettings.width / 2) + (Settings.applicationSettings.width / 5);
+			this.portraitLandscapeButton.y =
+				(Settings.applicationSettings.height / 2);
+		} else {
+			this.playButton.rotation = 0;
+			this.portraitLandscapeButton.rotation = 0;
+			this.portraitLandscapeButton.x =
+				(Settings.applicationSettings.width / 2);
+			this.portraitLandscapeButton.y =
+				(Settings.applicationSettings.height / 2) + (Settings.applicationSettings.height / 5);
+		}
+
 	}
 
 	endStep(delta) {

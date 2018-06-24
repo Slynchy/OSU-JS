@@ -40,7 +40,7 @@ class Game extends Token {
 
 		this._currentComboCount = 0;
 
-		if (PIXI.sound) PIXI.sound.volumeAll = 0.1;
+		if (PIXI.sound) PIXI.sound.volumeAll = 0.2;
 
 		this.bg = new GameObject(
 			//this.activeTrack.bg,
@@ -56,19 +56,42 @@ class Game extends Token {
 		this.customBg = new GameObject(
 			t_black,
 			{
+				x: Settings.applicationSettings.width / 2,
+				y: Settings.applicationSettings.height / 2,
 				alpha: 0,
 				width: Settings.applicationSettings.width,
 				height: Settings.applicationSettings.height,
+				anchor: {
+					x: 0.5,
+					y: 0.5
+				},
 				z: -4
 			}
 		);
 		this.scene.addChild(this.customBg);
 
+		this.uiContainer = new ContainerObject({
+			x: Settings.GameSettings.portraitMode ?
+				50 :
+				Settings.applicationSettings.width / 2,
+			y: Settings.GameSettings.portraitMode ?
+				Settings.applicationSettings.height / 2 :
+				25,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
+			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0,
+		});
+
 		this.score = 0;
 		this.scoreDisplay = new Text({
 			text: '12345',
 			alpha: 0,
-			x: Settings.applicationSettings.width / 2,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(22),
@@ -76,15 +99,12 @@ class Game extends Token {
 				fill: '#ff0000'
 			})
 		});
-		this.scoreDisplay.anchor.x = 0.5;
-		this.scoreDisplay.anchor.y = 0;
-		this.scene.addChild(this.scoreDisplay);
+		this.uiContainer.addChild(this.scoreDisplay);
 
 		this._currentComboMultiplier = 1;
 		this.comboDisplay = new Text({
 			text: 'x1',
 			alpha: 0,
-			x: Settings.applicationSettings.width / 2,
 			y: 50,
 			anchor: {
 				x: 0.5,
@@ -97,7 +117,10 @@ class Game extends Token {
 				fill: '#ff0000'
 			})
 		});
-		this.scene.addChild(this.comboDisplay);
+		this.uiContainer.addChild(this.comboDisplay);
+		this.scene.addChild(this.uiContainer);
+
+		this._createDeathParticleSpawner();
 
 		let loadingText = new Text({
 			text: 'Loading audio file...',
@@ -116,8 +139,6 @@ class Game extends Token {
 		});
 		this.scene.addChild(loadingText);
 
-		this._createDeathParticleSpawner();
-
 		Application.stage.addChild(this.scene);
 
 		if (props) Object.assign(this, props);
@@ -128,8 +149,18 @@ class Game extends Token {
 			AudioLoader(
 				'./assets/tracks/'+ _SELECTED_OSU_FILE +'/' + this.activeTrack.data['General']['AudioFilename']
 			).then(buffer => {
-				if(resources['BG'])
+				if(resources['BG']){
 					this.customBg.texture = resources['BG'].texture;
+
+					if(Settings.GameSettings.portraitMode){
+						this.customBg.rotation = -1.571;
+
+						const aspect = Settings.applicationSettings.width / this.customBg.texture.height;
+
+						this.customBg.width = this.customBg.texture.width * aspect;
+						this.customBg.height = Settings.applicationSettings.width;
+					}
+				}
 
 				let self = this;
 
@@ -325,7 +356,7 @@ class Game extends Token {
 		this.__trackProgress = 0;
 		this._trackClock.start();
 		this.__trackInstance = this.__AUDIOSRC.start();
-		this.__AUDIOGAIN.gain.setValueAtTime(0.1, this.__AUDIOCTX.currentTime);
+		this.__AUDIOGAIN.gain.setValueAtTime(PIXI.sound.volumeAll * 2, this.__AUDIOCTX.currentTime);
 		//this.__trackInstance.on('progress', this._onProgress.bind(this));
 	}
 
@@ -445,6 +476,10 @@ class Game extends Token {
 				if (diff >= Settings.OSUSettings.timing_threshold) {
 					console.warn('Out of timing by %ims', diff * 1000);
 				}
+				if(diff >= Settings.OSUSettings.timing_hard_threshold){
+					console.warn('Not spawning object because timing exceeds hard threshold');
+					return;
+				}
 
 				switch (current.type.type) {
 					case 'slider':
@@ -476,6 +511,8 @@ class Game extends Token {
 		//if (current.path.sliderType === 'bezier') return;
 
 		let pos = osuScale(current.x, current.y);
+		pos.x += this._offset.x;
+		pos.y += this._offset.y;
 
 		if (current.type.isNewCombo) {
 			this._currentComboCount = 0;
@@ -490,8 +527,8 @@ class Game extends Token {
 		this._currentComboCount += 1;
 		this.scene.addChild(
 			new SliderHitObject(
-				pos.x + this._offset.x,
-				pos.y + this._offset.y,
+				pos.x,
+				pos.y,
 				current.type,
 				{
 					comboNumber: this._currentComboCount,
@@ -528,14 +565,17 @@ class Game extends Token {
 
 	_spawnCircle(current, index) {
 		let pos = osuScale(current.x, current.y);
+		pos.x += this._offset.x;
+		pos.y += this._offset.y;
 		if (current.type.isNewCombo) {
 			this._currentComboCount = 0;
 		}
 		if(!index) index = 0;
+
 		this.scene.addChild(
 			new CircleHitObject(
-				pos.x + this._offset.x,
-				pos.y + this._offset.y,
+				pos.x,
+				pos.y,
 				current.type,
 				{
 					z: this.activeTrack.data['HitObjects'].length - index,

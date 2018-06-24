@@ -45,55 +45,80 @@ class FlowController {
 		if(window['FBInstant']){
 			this.currentAction = this.waitForFBInstant;
 			FBInstant.initializeAsync()
-				.then(function () {
+				.then(()=>{
 					console.log("[flowController] initializeAsync resolved");
-					// console.log("[flowController] Initializing ad api");
-					// AdAPI.initialize(function () {
-					// 	console.log("[flowController] AdAPI initialized");
-					// 	self.currentAction = self.initializeSaveData;
-					// });
-					FBInstant.startGameAsync()
-						.then(() => {
-							global.FBINSTANT_INFO = {
-								contextId: FBInstant.context.getID(),
-								contextType: FBInstant.context.getType(),
-								isSoloContext: (FBInstant.context.getType() === "SOLO"),
-								context: FBInstant.context,
-								players: null,
-								contextLeaderboard: null,
-								playerInfo: {
-									displayName: FBInstant.player.getName(),
-									id: FBInstant.player.getID(),
-								}
-							};
-
-							if(global.FBINSTANT_INFO.isSoloContext){
-								self.currentAction = self.startMainMenu;
-							} else {
-								FBInstant.context.getPlayersAsync().then((players)=>{
-									global.FBINSTANT_INFO.players = players;
-									self.currentAction = self.startMainMenu;
-								})
-									.catch((err)=>{
-										console.error(err);
-										self.currentAction = self.startMainMenu;
-									});
-							}
-
-						})
-						.catch((err)=>{
-							console.error(err);
-						});
+					this.currentAction = this.loadMainMenuAssets;
 				})
 				.catch(err => {
 					console.error(err);
 				})
 		} else {
-			this.currentAction = this.startMainMenu;
+			this.currentAction = this.loadMainMenuAssets;
 		}
 	}
 
 	waitForFBInstant(){}
+
+	loadMainMenuAssets(){
+		this.currentAction = this.waitForMainMenuAssets;
+		AssetLoader.LoadAssetsFromAssetList(Settings.mainMenuAssets).then(
+			() => {
+				if(window['FBInstant']) {
+					this.currentAction = this.hackilyStartFacebook;
+				} else {
+					this.currentAction = this.startMainMenu;
+				}
+				console.log('[FlowController] Finished loading mainmenu assets');
+			},
+			err => {
+				console.error(err);
+			}
+		);
+	}
+
+	waitForMainMenuAssets(){
+		if(window['FBInstant']){
+			FBInstant.setLoadingProgress(PIXI.loader.progress);
+		}
+	}
+
+	hackilyStartFacebook(){
+		this.currentAction = this.waitForFBInstant;
+		FBInstant.startGameAsync()
+			.then(() => {
+				global.FBINSTANT_INFO = {
+					contextId: FBInstant.context.getID(),
+					contextType: FBInstant.context.getType(),
+					isSoloContext: (FBInstant.context.getType() === "SOLO"),
+					context: FBInstant.context,
+					players: null,
+					contextLeaderboard: null,
+					playerInfo: {
+						displayName: FBInstant.player.getName(),
+						id: FBInstant.player.getID(),
+					}
+				};
+
+				if(global.FBINSTANT_INFO.isSoloContext){
+					self.currentAction = self.startMainMenu;
+				} else {
+					FBInstant.context.getPlayersAsync().then((players)=>{
+						global.FBINSTANT_INFO.players = players;
+						self.currentAction = self.startMainMenu;
+					})
+						.catch((err)=>{
+							console.error(err);
+							self.currentAction = self.startMainMenu;
+						});
+				}
+
+			})
+			.catch((err)=>{
+				console.error(err);
+			});
+	}
+
+	waitForFBInstantStart(){}
 
 	startMainMenu() {
 		this.currentAction = this.onMainMenu;

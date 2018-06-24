@@ -41,7 +41,7 @@ class SliderHitObject extends ContainerObject {
 		this.offset = {
 			x: 0,
 			y: 0
-		}
+		};
 		Object.assign(this, metadata);
 
 		this.perfectScore = true;
@@ -253,9 +253,18 @@ class SliderHitObject extends ContainerObject {
 
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
+			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
+			_sliderOffset: {
+				x: 0,
+				y: 0
+			},
 			style: new PIXI.TextStyle({
 				align: 'center',
-				fontSize: osuScale(18)
+				fontSize: osuScale(22)
 			})
 		});
 		this.addChild(this.comboText);
@@ -286,8 +295,8 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	endStep(dt) {
-		this.comboText.x = this.target.x - 7;
-		this.comboText.y = this.target.y - 15;
+		this.comboText.x = this.target.x + this.comboText._sliderOffset.x;
+		this.comboText.y = this.target.y + this.comboText._sliderOffset.y;
 
 		if (this.particleEmitter && this._clicked) {
 			this.particleEmitter.updateSpawnPos(this.target.x, this.target.y);

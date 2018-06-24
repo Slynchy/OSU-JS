@@ -42,7 +42,9 @@ class Settings {
 			height: window.innerHeight
 		};
 
-		this.GameSettings = {};
+		this.GameSettings = {
+			portraitMode: true,
+		};
 
 		this.Analytics = {
 			enabled: false,
@@ -53,14 +55,20 @@ class Settings {
 		};
 
 		this.OSUSettings = {
-			timing_threshold: 0.066, // difference of 66ms
+			timing_threshold: 0.066, // difference of 66ms, for LOGGING ONLY
+			timing_hard_threshold: 0.5, // difference of 500ms; if over this, don't spawn obj
 
 			slider_reward_threshold: 0.97 // if slider progress exceeds this value when mouse released, award points
 		};
 
-		this.resources = {
+		this.mainMenuAssets = {
 			t_black: 'black.png',
 			t_white: 'white.png',
+			t_button_portrait: 'portrait_button.png',
+			t_button_landscape: 'landscape_button.png',
+		};
+
+		this.resources = {
 			t_whiteCircle: 'white_circle.png',
 			t_redbg9s: 'redbg_9slice.png',
 			t_circleOutline: 'circle_outline.png',

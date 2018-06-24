@@ -54,6 +54,7 @@ class CircleHitObject extends GameObject {
 
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
+			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0,
 			style: new PIXI.TextStyle({
 				align: 'center',
 				fontSize: osuScale(54)
