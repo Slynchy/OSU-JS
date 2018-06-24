@@ -435,7 +435,7 @@ class Game extends Token {
 	}
 
 	async _scheduleHitObjectSpawns() {
-		for (let k in this.activeTrack.data['HitObjects']) {
+		for (let k = 0; k < this.activeTrack.data['HitObjects'].length; k++) {
 			let current = this.activeTrack.data['HitObjects'][k];
 
 			let timestamp = current.time * 0.001 - this._preempt * 0.001;
@@ -448,11 +448,11 @@ class Game extends Token {
 
 				switch (current.type.type) {
 					case 'slider':
-						this._spawnSlider(current);
+						this._spawnSlider(current, k);
 						break;
 					default:
 					case 'circle':
-						this._spawnCircle(current);
+						this._spawnCircle(current, k);
 						break;
 				}
 			});
@@ -471,7 +471,7 @@ class Game extends Token {
 		}
 	}
 
-	_spawnSlider(current) {
+	_spawnSlider(current, index) {
 		//TODO: fix this hack
 		//if (current.path.sliderType === 'bezier') return;
 
@@ -481,17 +481,21 @@ class Game extends Token {
 			this._currentComboCount = 0;
 		}
 
+		if(!index) index = 0;
+
 		let sampleSet = this._activeSampleSet;
 		if(current['extras'] && current['extras']['sampleSet'] && current['extras']['sampleSet'] !== 'auto'){
 			sampleSet = (current['extras']['sampleSet']);
 		}
-
+		this._currentComboCount += 1;
 		this.scene.addChild(
 			new SliderHitObject(
 				pos.x + this._offset.x,
 				pos.y + this._offset.y,
 				current.type,
 				{
+					comboNumber: this._currentComboCount,
+					z: this.activeTrack.data['HitObjects'].length - index,
 					offset: this._offset,
 					fadein: this._fadein,
 					preempt: this._preempt,
@@ -500,7 +504,6 @@ class Game extends Token {
 					repeat: current.repeat,
 					mpb: this._activeMPB,
 					tickRate: this.activeTrack.data['Difficulty']['SliderTickRate'],
-					comboNumber: ++this._currentComboCount,
 					tickerSound: this._getTickerSound(),
 					sliderSound: this._getSliderSound(current),
 					edgeSounds: this._getEdgeHitSounds(current),
@@ -523,17 +526,19 @@ class Game extends Token {
 		);
 	}
 
-	_spawnCircle(current) {
+	_spawnCircle(current, index) {
 		let pos = osuScale(current.x, current.y);
 		if (current.type.isNewCombo) {
 			this._currentComboCount = 0;
 		}
+		if(!index) index = 0;
 		this.scene.addChild(
 			new CircleHitObject(
 				pos.x + this._offset.x,
 				pos.y + this._offset.y,
 				current.type,
 				{
+					z: this.activeTrack.data['HitObjects'].length - index,
 					offset: this._offset,
 					fadein: this._fadein,
 					preempt: this._preempt,
