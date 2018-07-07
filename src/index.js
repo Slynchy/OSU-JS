@@ -7,6 +7,7 @@ global._SELECTED_OSU_FILE = "WAKE_ME_UP";
 import './styles/app.css';
 import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
 global.fnt_exo_20_black = fnt_exo_20_black;
+
 const PIXI = (global.PIXI = require('pixi.js'));
 const PIXISND = (global.PIXISND = require('pixi-sound'));
 const PIXIPART = (global.PIXIPART = require('./pixi-particles.js'));
@@ -85,31 +86,30 @@ let resize = function() {
 
 	Application.view.setAttribute(
 		'style',
-		//__CACHEDCSSSTYLE +
 		' ' +
-			'-ms-transform: scale(' +
-			scale +
-			'); -webkit-transform: scale3d(' +
-			scale +
-			', 1); -moz-transform: scale(' +
-			scale +
-			'); -o-transform: scale(' +
-			scale +
-			'); transform: scale(' +
-			scale +
-			'); max-width: 100%;max-height: 100%;'
+		'-ms-transform: scale(' +
+		scale +
+		'); -webkit-transform: scale3d(' +
+		scale +
+		', 1); -moz-transform: scale(' +
+		scale +
+		'); -o-transform: scale(' +
+		scale +
+		'); transform: scale(' +
+		scale +
+		'); max-width: 100%;max-height: 100%;'
 	);
 };
 window.addEventListener('resize', resize);
 resize();
 
-const flowController = (global.flowController = require('./flowController.js'));
+const FlowController = (global.FlowController = require('./flowController.js'));
 
 Application.ticker.add(delta => {
 	'use strict';
 	let deltaTime = Application.ticker.elapsedMS;
 
-	if (flowController.currentAction) flowController.currentAction();
+	if (FlowController.currentAction) FlowController.currentAction();
 
 	for (let i = 0; i < Tokens.length; i++) {
 		if (!Tokens[i]._queuedForDestruction && Tokens[i].startStep) {

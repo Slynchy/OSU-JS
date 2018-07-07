@@ -46,7 +46,7 @@ class FlowController {
 			this.currentAction = this.waitForFBInstant;
 			FBInstant.initializeAsync()
 				.then(()=>{
-					console.log("[flowController] initializeAsync resolved");
+					console.log("[FlowController] initializeAsync resolved");
 					this.currentAction = this.loadMainMenuAssets;
 				})
 				.catch(err => {
@@ -134,7 +134,7 @@ class FlowController {
 	onMainMenu() {}
 
 	startLoading() {
-		console.log('[flowController] startLoading');
+		console.log('[FlowController] startLoading');
 
 		AssetLoader.LoadAssetsFromAssetList(Settings.resources).then(
 			() => {

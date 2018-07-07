@@ -36,7 +36,7 @@ class MainMenu extends Token {
 			},
 			style: new PIXI.TextStyle({
 				align: 'center',
-				fontSize: osuScale(22),
+				fontSize: 48,
 				fontFamily: fnt_exo_20_black,
 				fill: '#ff0000'
 			}),

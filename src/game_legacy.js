@@ -9,6 +9,10 @@ let SliderHitObject = require('./Objects/SliderHitObject.js');
 let WebAudioScheduler = require('web-audio-scheduler');
 let AudioLoader = require('audio-loader');
 
+/**
+ * Class for the normal version of Osu!
+ * @deprecated
+ */
 class Game_legacy extends Token {
 	constructor(osuFile, props) {
 		super({});

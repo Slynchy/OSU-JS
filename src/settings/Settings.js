@@ -1,9 +1,11 @@
-let game = require('../game_legacy.js');
+let game = require('../game.js');
+//let game_legacy = require('../game_legacy.js');
 let mainMenu = require('../Tokens/MainMenu.js');
 
 class Settings {
 	constructor() {
 		this.DEBUG = {
+			enabled: true,
 			suppressLoadingLogs: true
 		};
 
@@ -24,8 +26,8 @@ class Settings {
 
 		this.applicationSettings = {
 			// REQUIRED
-			width: 783,
-			height: 1350,
+			width: 540,
+			height: 960,
 			sharedTicker: true,
 			autoStart: false,
 			backgroundColor: 0x000000,
@@ -115,8 +117,8 @@ class Settings {
 
 		this.audioSettings = {
 			globalVolume: 0.15,
-			sfxVolume: 1.0, // unused
-			musicVolume: 1.0 // unused
+			sfxVolume: 0.15,
+			musicVolume: 0.15
 		};
 
 		this.osuDefaults = {
