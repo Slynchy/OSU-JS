@@ -1,4 +1,4 @@
-let game = require('../game.js');
+let game = require('../game_legacy.js');
 let mainMenu = require('../Tokens/MainMenu.js');
 
 class Settings {
@@ -24,8 +24,8 @@ class Settings {
 
 		this.applicationSettings = {
 			// REQUIRED
-			width: 1350,
-			height: 783,
+			width: 783,
+			height: 1350,
 			sharedTicker: true,
 			autoStart: false,
 			backgroundColor: 0x000000,
@@ -43,7 +43,7 @@ class Settings {
 		};
 
 		this.GameSettings = {
-			portraitMode: true,
+			portraitMode: false,
 		};
 
 		this.Analytics = {
@@ -105,7 +105,7 @@ class Settings {
 		this.osuTracks = [
 			"WAKE_ME_UP",
 			"STYX_HELIX",
-			"HANA_NO_IRO"
+			"JUMPIN_JUMP_UP"
 		];
 
 		this.Leaderboards = {

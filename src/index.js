@@ -11,7 +11,8 @@ const PIXI = (global.PIXI = require('pixi.js'));
 const PIXISND = (global.PIXISND = require('pixi-sound'));
 const PIXIPART = (global.PIXIPART = require('./pixi-particles.js'));
 
-require('./engine/MiscPolyfills.js');
+global.FBEngine = require('fbengine');
+
 require('./vector.js');
 
 global.osuScale = function(x, y) {
@@ -36,21 +37,32 @@ global.GetOSUFile = function(name) {
 	return global._OSUFILECACHE[name];
 };
 
-require('./engine/FBInstant.js');
-
 const Settings = (global.Settings = require('./Settings/Settings.js'));
-const Leaderboards = (global.Leaderboards = require('./engine/FBLeaderboards.js'));
-const AdAPI = (global.AdAPI = require('./engine/Adverts.js'));
-const SaveData = (global.SaveData = require('./engine/SaveData.js'));
-const AudioAPI = (global.AudioAPI = require('./engine/Audio.js'));
-const AssetLoader = (global.AssetLoader = require('./engine/AssetLoader.js'));
-const Analytics = (global.Analytics = require('./engine/Analytics.js'));
-const Easing = (global.Easing = require('./engine/Easing.js'));
+
+const Leaderboards = new (FBEngine.Leaderboards)();
+global.Leaderboards = Leaderboards;
+
+const AdAPI = new (FBEngine.Adverts)();
+global.AdAPI = AdAPI;
+
+const SaveData = new (FBEngine.SaveData)();
+global.SaveData = SaveData;
+
+const AudioAPI = new (FBEngine.Audio)();
+global.AudioAPI = AudioAPI;
+
+const AssetLoader = (global.AssetLoader = FBEngine.AssetLoader);
+
+const Analytics = new (require('fbengine').Analytics)();
+global.Analytics = Analytics;
+
+const Easing = (global.Easing =  FBEngine.Easing);
+
 const Tokens = (global.Tokens = []);
 
 PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
 const Application = (global.Application = new PIXI.Application(Settings.applicationSettings));
-const EventHandler = (global.EventHandler = new (require('./engine/EventHandler.js'))(
+const EventHandler = (global.EventHandler = new (FBEngine.EventHandler)(
 	Application.ticker
 ));
 Application.renderer.backgroundColor = Settings.applicationSettings.backgroundColor;

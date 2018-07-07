@@ -57,7 +57,7 @@ const rules = [
 publicPath = '';
 
 //Development plugin
-plugins.push(new webpack.HotModuleReplacementPlugin());
+plugins.push(new webpack.HotModuleReplacementPlugin({multistep:false}));
 plugins.push(new webpack.NamedModulesPlugin());
 plugins.push(new CopyWebpackPlugin([
     {
@@ -88,7 +88,7 @@ module.exports = {
         net: 'empty'
     },
     devServer: {
-        hot: true,
+        hot: false,
         port: 3000,
         overlay: true,
         stats: "minimal"

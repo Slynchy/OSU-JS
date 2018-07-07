@@ -1,7 +1,6 @@
-let NineSliceObject = require('../engine/NineSliceObject.js');
-let ContainerObject = require('../engine/ContainerObject.js');
-let GameObject = require('../engine/GameObject.js');
-let Text = require('../engine/Text.js');
+let ContainerObject = FBEngine.ContainerObject;
+let GameObject = FBEngine.GameObject;
+let Text = FBEngine.Text;
 let CircularArcApproximator = require('../CircularArcApproximator.js');
 
 class SliderHitObject extends ContainerObject {

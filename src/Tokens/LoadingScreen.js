@@ -1,5 +1,5 @@
-let Token = require('../engine/Token.js');
-let ContainerObject = require('../engine/ContainerObject.js');
+let Token = FBEngine.Token;
+let ContainerObject = FBEngine.ContainerObject;
 
 class LoadingScreen extends Token {
 	constructor(props) {

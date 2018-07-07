@@ -1,5 +1,5 @@
-let GameObject = require('../engine/GameObject.js');
-let Text = require('../engine/Text.js');
+let GameObject = FBEngine.GameObject;
+let Text = FBEngine.Text;
 
 class CircleHitObject extends GameObject {
 	/**
