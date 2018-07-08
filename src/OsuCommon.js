@@ -4,30 +4,32 @@ let WebAudioScheduler = require('web-audio-scheduler');
  * Class of common functions between Osu! game types (currently legacy/regular and osu!mania)
  */
 class OsuCommon {
-	constructor(){ console.warn("OsuCommon should not be instantiated!"); }
+	constructor() {
+		console.warn('OsuCommon should not be instantiated!');
+	}
 
-	static log(str){
-		if(Settings.DEBUG.enabled === true){
+	static log(str) {
+		if (Settings.DEBUG.enabled === true) {
 			console.log(`[OsuCommon] - ${str}`);
 		}
 	}
 
-	static warn(str){
-		if(Settings.DEBUG.enabled === true){
+	static warn(str) {
+		if (Settings.DEBUG.enabled === true) {
 			console.warn(`[OsuCommon] - ${str}`);
 		}
 	}
 
-	static error(str){
-		if(Settings.DEBUG.enabled === true){
+	static error(str) {
+		if (Settings.DEBUG.enabled === true) {
 			console.error(`[OsuCommon] - ${str}`);
 		}
 	}
 
-	static initializeAudioCTX(buffer, context){
-		if(!context) throw new Error('Requires context!');
+	static initializeAudioCTX(buffer, context) {
+		if (!context) throw new Error('Requires context!');
 
-		((function _initializeAudioCTX(){
+		(function _initializeAudioCTX() {
 			OsuCommon.log('initializeAudioCTX');
 			this.__AUDIOCTX = new AudioContext();
 			this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
@@ -35,13 +37,13 @@ class OsuCommon {
 			this.__AUDIOSRC.buffer = buffer;
 			this.__AUDIOSRC.connect(this.__AUDIOGAIN);
 			this.__AUDIOGAIN.connect(this.__AUDIOCTX.destination);
-		}).bind(context))();
+		}.bind(context)());
 	}
 
-	static createDeathParticleSpawner(container,context) {
-		((function _createDeathParticleSpawner(){
-			if(this.emitterContainer){
-				console.warn("Already created death particle spawner!");
+	static createDeathParticleSpawner(container, context) {
+		(function _createDeathParticleSpawner() {
+			if (this.emitterContainer) {
+				console.warn('Already created death particle spawner!');
 				return;
 			}
 
@@ -55,18 +57,18 @@ class OsuCommon {
 				alpha: true
 			});
 			container.addChild(this.emitterContainer);
-		}).bind(context))();
+		}.bind(context)());
 	}
 
 	static calculatePreempt(difficulty) {
 		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
-			return 1200 + 600 * (5 - AR) / 5;
+			return 1200 + (600 * (5 - AR)) / 5;
 		} else if (AR === 5) {
 			return 1200;
 		} else if (AR > 5) {
-			return 1200 - 750 * (AR - 5) / 5;
+			return 1200 - (750 * (AR - 5)) / 5;
 		}
 
 		throw new Error('AR not a number!');
@@ -76,11 +78,11 @@ class OsuCommon {
 		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
-			return 800 + 400 * (5 - AR) / 5;
+			return 800 + (400 * (5 - AR)) / 5;
 		} else if (AR === 5) {
 			return 800;
 		} else if (AR > 5) {
-			return 800 - 500 * (AR - 5) / 5;
+			return 800 - (500 * (AR - 5)) / 5;
 		}
 
 		throw new Error('AR not a number!');
@@ -103,31 +105,31 @@ class OsuCommon {
 	}
 
 	static createScheduler(context) {
-		((function _createScheduler(){
+		(function _createScheduler() {
 			OsuCommon.log('createScheduler');
-			if(!this.__AUDIOCTX){
-				throw new Error("Requires audioCTX to be initialized!");
+			if (!this.__AUDIOCTX) {
+				throw new Error('Requires audioCTX to be initialized!');
 			}
 			this._trackClock = new WebAudioScheduler({
 				context: this.__AUDIOCTX,
 				interval: 0.0125,
 				aheadTime: 0.025
 			});
-		}).bind(context))();
+		}.bind(context)());
 	}
 
 	static playTrack(volume, context) {
-		((function _playTrack(){
+		(function _playTrack() {
 			OsuCommon.log('playTrack');
 			this.__trackProgress = 0;
 			this._trackClock.start();
 			this.__trackInstance = this.__AUDIOSRC.start();
 			this.__AUDIOGAIN.gain.setValueAtTime(volume, this.__AUDIOCTX.currentTime);
-		}).bind(context))();
+		}.bind(context)());
 	}
 
 	static setTimingPointData(tpoint, context) {
-		((function _setTimingPointData(){
+		(function _setTimingPointData() {
 			OsuCommon.log('setTimingPointData');
 			let tempTpoint = null;
 			if (tpoint.args) tempTpoint = tpoint.args;
@@ -138,11 +140,10 @@ class OsuCommon {
 			this._activeSampleSet = tempTpoint.sampleSet;
 			this._activeSampleIndex = tempTpoint.sampleIndex;
 
-			if (PIXI.sound)
-				PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * this.globalVolume;
+			if (PIXI.sound) PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * this.globalVolume;
 
 			tpoint.done = true;
-		}).bind(context))();
+		}.bind(context)());
 	}
 }
 

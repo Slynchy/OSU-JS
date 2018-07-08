@@ -11,11 +11,11 @@ class SliderHitObject extends ContainerObject {
 		};
 	}
 
-	_applyOffset(input){
-		if(input.x){
+	_applyOffset(input) {
+		if (input.x) {
 			input.x += this.offset.x;
 		}
-		if(input.y){
+		if (input.y) {
 			input.y += this.offset.y;
 		}
 		return input;
@@ -79,7 +79,6 @@ class SliderHitObject extends ContainerObject {
 			case 'catmull':
 			default:
 				if (this.path['end']) {
-					// todo FIX THIS
 					this.bg
 						.lineStyle(5, 0xff0000)
 						.moveTo(0, 0)
@@ -109,16 +108,20 @@ class SliderHitObject extends ContainerObject {
 			let x = 0,
 				y = 0;
 			if (!this.perfPath) {
-				x = lerp(0, this.path['end'].x - this.x, 1 / (this.numberOfTicks + 1) * (i + 1));
-				y = lerp(0, this.path['end'].y - this.y, 1 / (this.numberOfTicks + 1) * (i + 1));
+				x = lerp(0, this.path['end'].x - this.x, (1 / (this.numberOfTicks + 1)) * (i + 1));
+				y = lerp(0, this.path['end'].y - this.y, (1 / (this.numberOfTicks + 1)) * (i + 1));
 			} else {
 				x =
 					this.perfPath[
-						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+						Math.floor(
+							this.perfPath.length * ((1 / (this.numberOfTicks + 1)) * (i + 1))
+						)
 					].x - this.x;
 				y =
 					this.perfPath[
-						Math.floor(this.perfPath.length * (1 / (this.numberOfTicks + 1) * (i + 1)))
+						Math.floor(
+							this.perfPath.length * ((1 / (this.numberOfTicks + 1)) * (i + 1))
+						)
 					].y - this.y;
 			}
 
@@ -288,8 +291,7 @@ class SliderHitObject extends ContainerObject {
 	}
 
 	expire() {
-		if (this.game)
-			this.game.resetCombo();
+		if (this.game) this.game.resetCombo();
 		this.destroy();
 	}
 
@@ -555,7 +557,7 @@ class SliderHitObject extends ContainerObject {
 		}
 
 		if (this.game) {
-			if(!this.perfectScore){
+			if (!this.perfectScore) {
 				this.game.resetCombo();
 			} else {
 				this.game.incrementCombo();

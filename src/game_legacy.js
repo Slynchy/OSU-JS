@@ -28,7 +28,7 @@ class Game_legacy extends Token {
 
 		this._offset = {
 			x: -(Settings.osuDefaults.Padding.x * 0.5),
-			y: -(Settings.osuDefaults.Padding.y * 0.5),
+			y: -(Settings.osuDefaults.Padding.y * 0.5)
 		};
 
 		this.difficulty = this.activeTrack.data['Difficulty'];
@@ -57,35 +57,28 @@ class Game_legacy extends Token {
 		);
 		this.scene.addChild(this.bg);
 
-		this.customBg = new GameObject(
-			t_black,
-			{
-				x: Settings.applicationSettings.width / 2,
-				y: Settings.applicationSettings.height / 2,
-				alpha: 0,
-				width: Settings.applicationSettings.width,
-				height: Settings.applicationSettings.height,
-				anchor: {
-					x: 0.5,
-					y: 0.5
-				},
-				z: -4
-			}
-		);
-		this.scene.addChild(this.customBg);
-
-		this.uiContainer = new ContainerObject({
-			x: Settings.GameSettings.portraitMode ?
-				50 :
-				Settings.applicationSettings.width / 2,
-			y: Settings.GameSettings.portraitMode ?
-				Settings.applicationSettings.height / 2 :
-				25,
+		this.customBg = new GameObject(t_black, {
+			x: Settings.applicationSettings.width / 2,
+			y: Settings.applicationSettings.height / 2,
+			alpha: 0,
+			width: Settings.applicationSettings.width,
+			height: Settings.applicationSettings.height,
 			anchor: {
 				x: 0.5,
 				y: 0.5
 			},
-			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0,
+			z: -4
+		});
+		this.scene.addChild(this.customBg);
+
+		this.uiContainer = new ContainerObject({
+			x: Settings.GameSettings.portraitMode ? 50 : Settings.applicationSettings.width / 2,
+			y: Settings.GameSettings.portraitMode ? Settings.applicationSettings.height / 2 : 25,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
+			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0
 		});
 
 		this.score = 0;
@@ -149,17 +142,21 @@ class Game_legacy extends Token {
 
 		AssetLoader.LoadAssetsFromAssetList(
 			this._createAssetLoaderObjectFromRequiredFiles(this.activeTrack.data['RequiredFiles'])
-		).then((resources) => {
+		).then(resources => {
 			AudioLoader(
-				'./assets/tracks/'+ _SELECTED_OSU_FILE +'/' + this.activeTrack.data['General']['AudioFilename']
+				'./assets/tracks/' +
+					_SELECTED_OSU_FILE +
+					'/' +
+					this.activeTrack.data['General']['AudioFilename']
 			).then(buffer => {
-				if(resources['BG']){
+				if (resources['BG']) {
 					this.customBg.texture = resources['BG'].texture;
 
-					if(Settings.GameSettings.portraitMode){
+					if (Settings.GameSettings.portraitMode) {
 						this.customBg.rotation = -1.571;
 
-						const aspect = Settings.applicationSettings.width / this.customBg.texture.height;
+						const aspect =
+							Settings.applicationSettings.width / this.customBg.texture.height;
 
 						this.customBg.width = this.customBg.texture.width * aspect;
 						this.customBg.height = Settings.applicationSettings.width;
@@ -172,16 +169,16 @@ class Game_legacy extends Token {
 				loadingText = null;
 
 				this._easeOutScalarHack(
-					()=>{
+					() => {
 						return self.customBg.alpha;
 					},
-					(x)=>{
+					x => {
 						self.customBg.alpha = x;
 					},
 					0.45,
 					0.3,
 					3000,
-					()=>{
+					() => {
 						self._initializeAudio(buffer);
 
 						self.scoreDisplay.alpha = 1;
@@ -193,38 +190,30 @@ class Game_legacy extends Token {
 						self._scheduleTimingPoints();
 						self._playTrack();
 						self._updateScore();
-
-
 					}
 				);
 			});
 		});
 	}
 
-	_easeOutScalarHack(getter, setter, target, speed, duration, onComplete){
+	_easeOutScalarHack(getter, setter, target, speed, duration, onComplete) {
 		let hack = {
-			get x(){
+			get x() {
 				return getter();
 			},
-			get y(){
+			get y() {
 				return 0;
 			},
-			set x(x){
+			set x(x) {
 				setter(x);
 			},
-			set y(y){}
+			set y(y) {}
 		};
 
-		Easing.easeOutQuadAsync(
-			hack,
-			{x: target, y: 0},
-			speed,
-			duration,
-			onComplete
-		);
+		Easing.easeOutQuadAsync(hack, { x: target, y: 0 }, speed, duration, onComplete);
 	}
 
-	_initializeAudio(buffer){
+	_initializeAudio(buffer) {
 		this.__AUDIOCTX = new AudioContext();
 		this.__AUDIOGAIN = this.__AUDIOCTX.createGain();
 		this.__AUDIOSRC = this.__AUDIOCTX.createBufferSource();
@@ -353,7 +342,7 @@ class Game_legacy extends Token {
 	}
 
 	_updateCombo() {
-		this.comboDisplay.text = "x" + this._currentComboMultiplier.toString();
+		this.comboDisplay.text = 'x' + this._currentComboMultiplier.toString();
 	}
 
 	_playTrack() {
@@ -368,29 +357,34 @@ class Game_legacy extends Token {
 		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
-			return 1200 + 600 * (5 - AR) / 5;
+			return 1200 + (600 * (5 - AR)) / 5;
 		} else if (AR === 5) {
 			return 1200;
 		} else if (AR > 5) {
-			return 1200 - 750 * (AR - 5) / 5;
+			return 1200 - (750 * (AR - 5)) / 5;
 		}
 
 		throw new Error('AR not a number!');
 	}
 
 	calculateScore(difficulty, timestamp, sliderVals) {
-		return Game_legacy._calculateScore(difficulty, timestamp, sliderVals, this._currentComboMultiplier);
+		return Game_legacy._calculateScore(
+			difficulty,
+			timestamp,
+			sliderVals,
+			this._currentComboMultiplier
+		);
 	}
 
 	static _calculateFadein(difficulty) {
 		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
 		if (AR < 5) {
-			return 800 + 400 * (5 - AR) / 5;
+			return 800 + (400 * (5 - AR)) / 5;
 		} else if (AR === 5) {
 			return 800;
 		} else if (AR > 5) {
-			return 800 - 500 * (AR - 5) / 5;
+			return 800 - (500 * (AR - 5)) / 5;
 		}
 
 		throw new Error('AR not a number!');
@@ -400,11 +394,11 @@ class Game_legacy extends Token {
 		let OD = difficulty['OverallDifficulty'];
 		if (timestamp < 0) timestamp = Math.abs(timestamp);
 
-		if (timestamp < 50 + 30 * (5 - OD) / 5) {
+		if (timestamp < 50 + (30 * (5 - OD)) / 5) {
 			return 300;
-		} else if (timestamp < 100 + 40 * (5 - OD) / 5) {
+		} else if (timestamp < 100 + (40 * (5 - OD)) / 5) {
 			return 100;
-		} else if (timestamp < 50 + 30 * (5 - OD) / 5) {
+		} else if (timestamp < 50 + (30 * (5 - OD)) / 5) {
 			return 50;
 		} else {
 			return 0;
@@ -415,12 +409,12 @@ class Game_legacy extends Token {
 		return Game_legacy._calculateScoreThreshold(this.difficulty, timestamp);
 	}
 
-	resetCombo(){
+	resetCombo() {
 		this._currentComboMultiplier = 1;
 		this._updateCombo();
 	}
 
-	incrementCombo(){
+	incrementCombo() {
 		this._currentComboMultiplier++;
 		this._updateCombo();
 	}
@@ -458,7 +452,7 @@ class Game_legacy extends Token {
 
 		let modMult = 1;
 
-		return Math.floor(hitValue + hitValue * (comboMult * diffMult * modMult / 25));
+		return Math.floor(hitValue + hitValue * ((comboMult * diffMult * modMult) / 25));
 	}
 
 	_createScheduler() {
@@ -480,7 +474,7 @@ class Game_legacy extends Token {
 				if (diff >= Settings.OSUSettings.timing_threshold) {
 					console.warn('Out of timing by %ims', diff * 1000);
 				}
-				if(diff >= Settings.OSUSettings.timing_hard_threshold){
+				if (diff >= Settings.OSUSettings.timing_hard_threshold) {
 					console.warn('Not spawning object because timing exceeds hard threshold');
 					return;
 				}
@@ -511,7 +505,6 @@ class Game_legacy extends Token {
 	}
 
 	_spawnSlider(current, index) {
-		//TODO: fix this hack
 		//if (current.path.sliderType === 'bezier') return;
 
 		let pos = osuScale(current.x, current.y);
@@ -522,11 +515,15 @@ class Game_legacy extends Token {
 			this._currentComboCount = 0;
 		}
 
-		if(!index) index = 0;
+		if (!index) index = 0;
 
 		let sampleSet = this._activeSampleSet;
-		if(current['extras'] && current['extras']['sampleSet'] && current['extras']['sampleSet'] !== 'auto'){
-			sampleSet = (current['extras']['sampleSet']);
+		if (
+			current['extras'] &&
+			current['extras']['sampleSet'] &&
+			current['extras']['sampleSet'] !== 'auto'
+		) {
+			sampleSet = current['extras']['sampleSet'];
 		}
 		this._currentComboCount += 1;
 		this.scene.addChild(
@@ -548,15 +545,10 @@ class Game_legacy extends Token {
 					tickerSound: this._getTickerSound(),
 					sliderSound: this._getSliderSound(current),
 					edgeSounds: this._getEdgeHitSounds(current),
-					defaultSound: global[(
-						'snd_' +
-						sampleSet +
-						'_hit' +
-						'normal')
-						.toLowerCase()],
+					defaultSound: global[('snd_' + sampleSet + '_hit' + 'normal').toLowerCase()],
 					duration:
-						current.pixelLength /
-						(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier']) *
+						(current.pixelLength /
+							(100.0 * this.activeTrack.data['Difficulty']['SliderMultiplier'])) *
 						this._activeMPB,
 					playLargeParticleEffect: (x, y, color) => {
 						this._spawnLargeExplosionParticle(x, y, color);
@@ -574,7 +566,7 @@ class Game_legacy extends Token {
 		if (current.type.isNewCombo) {
 			this._currentComboCount = 0;
 		}
-		if(!index) index = 0;
+		if (!index) index = 0;
 
 		this.scene.addChild(
 			new CircleHitObject(
@@ -604,8 +596,12 @@ class Game_legacy extends Token {
 		for (let k in entry['hitSound']) {
 			if (entry['hitSound'][k] === true || k === 'normal') {
 				let sampleSet = this._activeSampleSet;
-				if(entry['extras'] && entry['extras']['sampleSet'] && entry['extras']['sampleSet'] !== 'auto'){
-					sampleSet = (entry['extras']['sampleSet']);
+				if (
+					entry['extras'] &&
+					entry['extras']['sampleSet'] &&
+					entry['extras']['sampleSet'] !== 'auto'
+				) {
+					sampleSet = entry['extras']['sampleSet'];
 				}
 				let file = (
 					'snd_' +
@@ -660,8 +656,12 @@ class Game_legacy extends Token {
 		let result = [];
 
 		let sampleSet = this._activeSampleSet;
-		if(entry['extras'] && entry['extras']['sampleSet'] && entry['extras']['sampleSet'] !== 'auto'){
-			sampleSet = (entry['extras']['sampleSet']);
+		if (
+			entry['extras'] &&
+			entry['extras']['sampleSet'] &&
+			entry['extras']['sampleSet'] !== 'auto'
+		) {
+			sampleSet = entry['extras']['sampleSet'];
 		}
 
 		for (let i in entry['edgeHitsounds']) {
@@ -701,8 +701,6 @@ class Game_legacy extends Token {
 		this._activeSampleIndex = tempTpoint.sampleIndex;
 
 		if (PIXI.sound) PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * this.globalVolume;
-
-		// todo
 
 		tpoint.done = true;
 	}

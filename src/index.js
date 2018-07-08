@@ -2,7 +2,7 @@
     (/・ω・)/
  */
 
-global._SELECTED_OSU_FILE = "WAKE_ME_UP";
+global._SELECTED_OSU_FILE = 'WAKE_ME_UP';
 
 import './styles/app.css';
 import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
@@ -20,11 +20,17 @@ global.osuScale = function(x, y) {
 	if (typeof y === 'undefined') {
 		if (typeof x === 'object') {
 			return {
-				x: x.x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512),
-				y: x.y * ((Settings.applicationSettings.height + Settings.osuDefaults.Padding.y) / 384)
+				x:
+					x.x *
+					((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512),
+				y:
+					x.y *
+					((Settings.applicationSettings.height + Settings.osuDefaults.Padding.y) / 384)
 			};
 		} else {
-			return x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512);
+			return (
+				x * ((Settings.applicationSettings.width + Settings.osuDefaults.Padding.x) / 512)
+			);
 		}
 	} else {
 		return {
@@ -40,32 +46,30 @@ global.GetOSUFile = function(name) {
 
 const Settings = (global.Settings = require('./Settings/Settings.js'));
 
-const Leaderboards = new (FBEngine.Leaderboards)();
+const Leaderboards = new FBEngine.Leaderboards();
 global.Leaderboards = Leaderboards;
 
-const AdAPI = new (FBEngine.Adverts)();
+const AdAPI = new FBEngine.Adverts();
 global.AdAPI = AdAPI;
 
-const SaveData = new (FBEngine.SaveData)();
+const SaveData = new FBEngine.SaveData();
 global.SaveData = SaveData;
 
-const AudioAPI = new (FBEngine.Audio)();
+const AudioAPI = new FBEngine.Audio();
 global.AudioAPI = AudioAPI;
 
 const AssetLoader = (global.AssetLoader = FBEngine.AssetLoader);
 
-const Analytics = new (require('fbengine').Analytics)();
+const Analytics = new (require('fbengine')).Analytics();
 global.Analytics = Analytics;
 
-const Easing = (global.Easing =  FBEngine.Easing);
+const Easing = (global.Easing = FBEngine.Easing);
 
 const Tokens = (global.Tokens = []);
 
 PIXI.settings.SCALE_MODE = Settings.applicationSettings.scaleMode;
 const Application = (global.Application = new PIXI.Application(Settings.applicationSettings));
-const EventHandler = (global.EventHandler = new (FBEngine.EventHandler)(
-	Application.ticker
-));
+const EventHandler = (global.EventHandler = new FBEngine.EventHandler(Application.ticker));
 Application.renderer.backgroundColor = Settings.applicationSettings.backgroundColor;
 document.body.appendChild(Application.view);
 SetRendererProperties(Application.renderer.view);
@@ -87,17 +91,17 @@ let resize = function() {
 	Application.view.setAttribute(
 		'style',
 		' ' +
-		'-ms-transform: scale(' +
-		scale +
-		'); -webkit-transform: scale3d(' +
-		scale +
-		', 1); -moz-transform: scale(' +
-		scale +
-		'); -o-transform: scale(' +
-		scale +
-		'); transform: scale(' +
-		scale +
-		'); max-width: 100%;max-height: 100%;'
+			'-ms-transform: scale(' +
+			scale +
+			'); -webkit-transform: scale3d(' +
+			scale +
+			', 1); -moz-transform: scale(' +
+			scale +
+			'); -o-transform: scale(' +
+			scale +
+			'); transform: scale(' +
+			scale +
+			'); max-width: 100%;max-height: 100%;'
 	);
 };
 window.addEventListener('resize', resize);

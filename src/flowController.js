@@ -38,32 +38,32 @@ class FlowController {
 		this.currentAction = this.hackilyInitFacebook;
 	}
 
-	hackilyInitFacebook(){
+	hackilyInitFacebook() {
 		//todo: implement properly
 		let self = this;
 
-		if(window['FBInstant']){
+		if (window['FBInstant']) {
 			this.currentAction = this.waitForFBInstant;
 			FBInstant.initializeAsync()
-				.then(()=>{
-					console.log("[FlowController] initializeAsync resolved");
+				.then(() => {
+					console.log('[FlowController] initializeAsync resolved');
 					this.currentAction = this.loadMainMenuAssets;
 				})
 				.catch(err => {
 					console.error(err);
-				})
+				});
 		} else {
 			this.currentAction = this.loadMainMenuAssets;
 		}
 	}
 
-	waitForFBInstant(){}
+	waitForFBInstant() {}
 
-	loadMainMenuAssets(){
+	loadMainMenuAssets() {
 		this.currentAction = this.waitForMainMenuAssets;
 		AssetLoader.LoadAssetsFromAssetList(Settings.mainMenuAssets).then(
 			() => {
-				if(window['FBInstant']) {
+				if (window['FBInstant']) {
 					this.currentAction = this.hackilyStartFacebook;
 				} else {
 					this.currentAction = this.startMainMenu;
@@ -76,49 +76,50 @@ class FlowController {
 		);
 	}
 
-	waitForMainMenuAssets(){
-		if(window['FBInstant']){
+	waitForMainMenuAssets() {
+		if (window['FBInstant']) {
 			FBInstant.setLoadingProgress(PIXI.loader.progress);
 		}
 	}
 
-	hackilyStartFacebook(){
+	hackilyStartFacebook() {
 		this.currentAction = this.waitForFBInstant;
 		FBInstant.startGameAsync()
 			.then(() => {
 				global.FBINSTANT_INFO = {
 					contextId: FBInstant.context.getID(),
 					contextType: FBInstant.context.getType(),
-					isSoloContext: (FBInstant.context.getType() === "SOLO"),
+					isSoloContext: FBInstant.context.getType() === 'SOLO',
 					context: FBInstant.context,
 					players: null,
 					contextLeaderboard: null,
 					playerInfo: {
 						displayName: FBInstant.player.getName(),
-						id: FBInstant.player.getID(),
+						id: FBInstant.player.getID()
 					}
 				};
 
-				if(global.FBINSTANT_INFO.isSoloContext){
+				if (global.FBINSTANT_INFO.isSoloContext) {
 					self.currentAction = self.startMainMenu;
 				} else {
-					FBInstant.context.getPlayersAsync().then((players)=>{
-						global.FBINSTANT_INFO.players = players;
-						self.currentAction = self.startMainMenu;
-					})
-						.catch((err)=>{
+					FBInstant.context
+						.getPlayersAsync()
+						.then(players => {
+							global.FBINSTANT_INFO.players = players;
+							self.currentAction = self.startMainMenu;
+						})
+						.catch(err => {
 							console.error(err);
 							self.currentAction = self.startMainMenu;
 						});
 				}
-
 			})
-			.catch((err)=>{
+			.catch(err => {
 				console.error(err);
 			});
 	}
 
-	waitForFBInstantStart(){}
+	waitForFBInstantStart() {}
 
 	startMainMenu() {
 		this.currentAction = this.onMainMenu;
@@ -155,8 +156,9 @@ class FlowController {
 	finishedLoading() {
 		'use strict';
 		let osuFiles = {};
-		for(let k in Settings.osuTracks){
-			osuFiles[Settings.osuTracks[k]] = ("tracks/" + Settings.osuTracks[k] + "/" + Settings.osuTracks[k] + ".osu");
+		for (let k in Settings.osuTracks) {
+			osuFiles[Settings.osuTracks[k]] =
+				'tracks/' + Settings.osuTracks[k] + '/' + Settings.osuTracks[k] + '.osu';
 		}
 
 		AssetLoader.LoadAssetsFromAssetList(osuFiles).then(
@@ -172,7 +174,7 @@ class FlowController {
 		this.currentAction = this.waitForOsuFile;
 	}
 
-	finishedLoadingOsuFiles(){
+	finishedLoadingOsuFiles() {
 		osujson.ParseOSUFileAsync(GetOSUFile(_SELECTED_OSU_FILE)).then(output => {
 			this._osuFile = output;
 			OSZHandler.HandleOSUFile(output).then(result => {

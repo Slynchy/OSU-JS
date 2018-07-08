@@ -60,8 +60,8 @@ class CircleHitObject extends GameObject {
 				fontSize: osuScale(54)
 			}),
 			anchor: {
-				x:0.5,
-				y:0.5
+				x: 0.5,
+				y: 0.5
 			}
 		});
 		this.addChild(this.comboText);
@@ -97,7 +97,7 @@ class CircleHitObject extends GameObject {
 		let score = this.game.calculateScore(this.game.difficulty, timeOffset);
 		let threshold = this.game.calculateScoreThreshold(timeOffset);
 
-		this.perfectScore = (threshold > 0);
+		this.perfectScore = threshold > 0;
 
 		if (this.perfectScore) {
 			this.playLargeParticleEffect(this.x, this.y, {
@@ -111,7 +111,7 @@ class CircleHitObject extends GameObject {
 		}
 
 		if (this.game) {
-			if(!this.perfectScore){
+			if (!this.perfectScore) {
 				this.game.resetCombo();
 			} else {
 				this.game.incrementCombo();
@@ -137,8 +137,7 @@ class CircleHitObject extends GameObject {
 		this.outline.scale.x = this.outline.scale.y = 3 - 2 * this._progressPreempt;
 
 		if (this.outline.scale.x <= 0) {
-			if (this.game)
-				this.game.resetCombo();
+			if (this.game) this.game.resetCombo();
 			this.destroy();
 		}
 	}
