@@ -65,6 +65,9 @@ module.exports = global.Settings || {
 	mainMenuAssets: {
 		t_black: 'black.png',
 		t_white: 'white.png',
+		t_red: 'red.png',
+		t_blue: 'blue.png',
+		t_green: 'green.png',
 		t_button_portrait: 'portrait_button.png',
 		t_button_landscape: 'landscape_button.png'
 	},
@@ -103,7 +106,7 @@ module.exports = global.Settings || {
 		t_spark: 'spark.png'
 	},
 
-	osuTracks: ['WAKE_ME_UP', 'STYX_HELIX', 'JUMPIN_JUMP_UP'],
+	osuTracks: ['WAKE_ME_UP', 'STYX_HELIX', 'JUMPIN_JUMP_UP', 'STAY_ALIVE', 'TRAILER', 'ZANARKAND', 'THESIS'],
 
 	OsuManiaSettings: {
 		ManiaLaneDefaults: {

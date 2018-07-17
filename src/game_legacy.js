@@ -720,21 +720,6 @@ class Game_legacy extends Token {
 		}
 	}
 
-	/**
-	 *
-	 * @param progress
-	 * @private
-	 * @deprecated
-	 */
-	_onProgress(progress) {
-		this.__trackProgress = progress;
-
-		let time = this.__trackProgress * this.activeTrack.track.duration;
-
-		//this._handleTimingPointProgress(time);
-		//this._handleHitObjectProgress(time);
-	}
-
 	get activeTrack() {
 		return this._osuFile;
 	}

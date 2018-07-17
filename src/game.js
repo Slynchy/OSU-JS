@@ -17,26 +17,50 @@ class Game extends Token {
 		this.sfxVolume = Settings.audioSettings.sfxVolume;
 		this.musicVolume = Settings.audioSettings.musicVolume;
 
-		this._numOfLanes = 3;
+		if(this.activeTrack.data['General']['Mode'] != 3){
+			//throw new Error("Not mania mode!");
+		}
+
 		this._isSetup = false;
 		this._currentComboCount = 0;
 		this._difficulty = this.activeTrack.data['Difficulty'];
-		this._overallDifficulty = this.activeTrack.data['Difficulty']['OverallDifficulty'];
+		this._numOfLanes = this._difficulty['CircleSize'];
+		this._overallDifficulty = this._difficulty['OverallDifficulty'];
 		this._fadein = OsuCommon.calculateFadein(this.activeTrack.data['Difficulty']);
 		this._preempt = OsuCommon.calculatePreempt(this.activeTrack.data['Difficulty']);
 		this._activeMPB = 1000;
 		this._activeSampleSet = 'normal';
 		this._activeSampleIndex = 0;
+		this._lanes = [];
 
 		OsuCommon.createDeathParticleSpawner(this.scene, this);
 		this.createLanes(this._numOfLanes);
 
+		document.addEventListener("keypress", (e)=>{
+			let lane;
+			if(e.keyCode-49 >= this._lanes.length) return;
+			else {
+				lane = this._lanes[e.keyCode-49];
+			}
+			lane._hitNote();
+			lane.button.setTexture(lane.button.downstateTexture);
+		});
+
+		document.addEventListener("keyup", (e)=>{
+			let lane;
+			if(e.keyCode-49 >= this._lanes.length) return;
+			else {
+				lane = this._lanes[e.keyCode-49];
+			}
+			lane.button.setTexture(lane.button.upstateTexture);
+		});
+
 		if (props) Object.assign(this, props);
 	}
 
-	loadRequiredAssets(reqFiles) {
+	loadRequiredAssets(reqFiles, hitobjects) {
 		return AssetLoader.LoadAssetsFromAssetList(
-			OsuCommon.createAssetLoaderObjectFromRequiredFiles(reqFiles)
+			OsuCommon.createAssetLoaderObjectFromRequiredFiles(reqFiles,hitobjects)
 		);
 	}
 
@@ -65,7 +89,12 @@ class Game extends Token {
 
 	setup() {
 		let self = this;
-		this.loadRequiredAssets(this.activeTrack.data['RequiredFiles']).then(resources => {
+		this.loadRequiredAssets(
+			this.activeTrack.data['RequiredFiles'],
+			this.activeTrack.data['HitObjects']
+		).then(resources => {
+			console.log(resources);
+			this._requiredAssets = resources;
 			this.loadAudioBuffer(
 				`./assets/tracks/${_SELECTED_OSU_FILE}/${
 					this.activeTrack.data['General']['AudioFilename']
@@ -104,9 +133,29 @@ class Game extends Token {
 					return;
 				}
 
-				// TODO: spawncode
+				let lane = Math.clamp(
+					Math.floor(current.x / Math.floor(512 / this._numOfLanes)),
+					0,
+					this._numOfLanes
+				);
+
+				let isHoldNote = current.type.isOsuMania;
+
+				//console.log("Spawning object %O in lane %i", current, lane);
+				//console.log();
+				this.spawnNote(lane, isHoldNote, current);
 			});
 		}
+	}
+
+	spawnNote(lane, isHoldNote, data){
+		console.log(`Spawning note with sampleset ${this._activeSampleSet}, sample index ${this._activeSampleIndex}, with the following sounds:`);
+		return this._lanes[lane].spawnNote(isHoldNote, {
+			spawnTime: Date.now(),
+			hitSounds: OsuCommon.getHitSound(data, this._activeSampleSet, this._activeSampleIndex, this._requiredAssets),
+			fadein: this._fadein,
+			preempt: this._preempt
+		});
 	}
 
 	async _scheduleTimingPoints(context) {
@@ -136,16 +185,22 @@ class Game extends Token {
 
 		for (let i = 0; i < numOfLanes; i++) {
 			let tempLane = new ManiaLane(i, {
-				numOfLanes: numOfLanes
+				numOfLanes: numOfLanes,
+				game: this
 			});
 			tempLane.x = tempLane.width * i;
-			this._lanes.push(this.scene.addChild(tempLane));
+			this.scene.addChild(tempLane);
+			this._lanes.push(tempLane);
 		}
 	}
 
 	onAdd() {
 		Application.stage.addChild(this.scene);
 		this.setup();
+	}
+
+	endStep(dt){
+		this.scene.endStep(dt);
 	}
 
 	onRemove() {

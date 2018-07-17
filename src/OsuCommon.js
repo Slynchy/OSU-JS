@@ -26,6 +26,54 @@ class OsuCommon {
 		}
 	}
 
+	/**
+	 * @param entry
+	 * @param activeSampleSet
+	 * @param activeSampleIndex
+	 * @param requiredAssets
+	 * @returns {Array}
+	 * @private
+	 */
+	static getHitSound(entry, activeSampleSet, activeSampleIndex, requiredAssets) {
+		let result = [];
+		if(!requiredAssets) requiredAssets = {};
+
+		for (let k in entry['hitSound']) {
+			if (entry['hitSound'][k] === true || k === 'normal') {
+				let sampleSet = activeSampleSet;
+				if (
+					entry['extras'] &&
+					entry['extras']['sampleSet'] &&
+					entry['extras']['sampleSet'] !== 'auto'
+				) {
+					sampleSet = entry['extras']['sampleSet'];
+				}
+				let file = (
+					'snd_' +
+					sampleSet +
+					'_hit' +
+					k +
+					(activeSampleIndex <= 1 ? '' : activeSampleIndex.toString())
+				).toLowerCase();
+
+				if(entry['extras'] && entry['extras']['filename'].indexOf('.wav') !== -1 && requiredAssets.hasOwnProperty(entry['extras']['filename'])){
+					result.push(requiredAssets[entry['extras']['filename']].sound);
+				} else if (requiredAssets.hasOwnProperty(file)) {
+					result.push(requiredAssets[file].sound);
+				} else if(global.hasOwnProperty(file)){
+					result.push(global[file]);
+				} else {
+					file = ('snd_' + activeSampleIndex + '_hit' + k + '').toLowerCase();
+
+					if (global.hasOwnProperty(file)) result.push(global[file]);
+					else console.error('Hitsound invalid! ' + file);
+				}
+			}
+		}
+
+		return result;
+	}
+
 	static initializeAudioCTX(buffer, context) {
 		if (!context) throw new Error('Requires context!');
 
@@ -74,6 +122,21 @@ class OsuCommon {
 		throw new Error('AR not a number!');
 	}
 
+	static calculateScoreThreshold(difficulty, timestamp) {
+		let OD = difficulty['OverallDifficulty'];
+		if (timestamp < 0) timestamp = Math.abs(timestamp);
+
+		if (timestamp < 50 + (30 * (5 - OD)) / 5) {
+			return 300;
+		} else if (timestamp < 100 + (40 * (5 - OD)) / 5) {
+			return 100;
+		} else if (timestamp < 50 + (30 * (5 - OD)) / 5) {
+			return 50;
+		} else {
+			return 0;
+		}
+	}
+
 	static calculateFadein(difficulty) {
 		let AR = difficulty['ApproachRate'] | Settings.osuDefaults.ApproachRate;
 
@@ -88,7 +151,7 @@ class OsuCommon {
 		throw new Error('AR not a number!');
 	}
 
-	static createAssetLoaderObjectFromRequiredFiles(reqFiles) {
+	static createAssetLoaderObjectFromRequiredFiles(reqFiles, hitobjects) {
 		let correctedFiles = {};
 		for (let i = 0; i < reqFiles.length; i++) {
 			// soft-hitclap3.wav
@@ -100,6 +163,22 @@ class OsuCommon {
 
 			correctedFiles[key] = 'tracks/' + _SELECTED_OSU_FILE + '/' + reqFiles[i];
 		}
+
+		if(hitobjects){
+			for(let i = 0; i < hitobjects.length; i++){
+				let current = hitobjects[i].extras;
+				if(!current) continue;
+
+				if(current.filename.indexOf('.wav') === -1){
+					continue;
+				}
+
+				if(!correctedFiles.hasOwnProperty(current.filename)){
+					correctedFiles[current.filename] = 'tracks/' + _SELECTED_OSU_FILE + '/' + current.filename;
+				}
+			}
+		}
+
 		correctedFiles['BG'] = 'tracks/' + _SELECTED_OSU_FILE + '/BG.jpg';
 		return correctedFiles;
 	}
@@ -140,7 +219,7 @@ class OsuCommon {
 			this._activeSampleSet = tempTpoint.sampleSet;
 			this._activeSampleIndex = tempTpoint.sampleIndex;
 
-			if (PIXI.sound) PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * this.globalVolume;
+			if (PIXI.sound) PIXI.sound.volumeAll = tempTpoint.volume * 0.01 * 1;//this.globalVolume;
 
 			tpoint.done = true;
 		}.bind(context)());
