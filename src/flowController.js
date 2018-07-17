@@ -44,6 +44,7 @@ class FlowController {
 
 		if (window['FBInstant']) {
 			this.currentAction = this.waitForFBInstant;
+			console.log('[FlowController] initializeAsync firing');
 			FBInstant.initializeAsync()
 				.then(() => {
 					console.log('[FlowController] initializeAsync resolved');
@@ -63,12 +64,12 @@ class FlowController {
 		this.currentAction = this.waitForMainMenuAssets;
 		AssetLoader.LoadAssetsFromAssetList(Settings.mainMenuAssets).then(
 			() => {
+				console.log('[FlowController] Finished loading mainmenu assets');
 				if (window['FBInstant']) {
 					this.currentAction = this.hackilyStartFacebook;
 				} else {
 					this.currentAction = this.startMainMenu;
 				}
-				console.log('[FlowController] Finished loading mainmenu assets');
 			},
 			err => {
 				console.error(err);
@@ -83,9 +84,11 @@ class FlowController {
 	}
 
 	hackilyStartFacebook() {
+		let self=this;
 		this.currentAction = this.waitForFBInstant;
 		FBInstant.startGameAsync()
 			.then(() => {
+				console.log("[FlowController] startGameAsync resolved");
 				global.FBINSTANT_INFO = {
 					contextId: FBInstant.context.getID(),
 					contextType: FBInstant.context.getType(),
