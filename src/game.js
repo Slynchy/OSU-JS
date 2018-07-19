@@ -12,6 +12,7 @@ class Game extends Token {
 		super({});
 
 		this._osuFile = osuFile;
+		console.log(osuFile);
 		this.name = 'osu!mania token';
 		this.scene = new ContainerObject();
 		this.sfxVolume = Settings.audioSettings.sfxVolume;
@@ -35,6 +36,33 @@ class Game extends Token {
 
 		OsuCommon.createDeathParticleSpawner(this.scene, this);
 		this.createLanes(this._numOfLanes);
+
+		this.uiContainer = new ContainerObject({
+			x: Settings.applicationSettings.width / 2,
+			y: 25,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
+			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0
+		});
+		this.score = 0;
+		this.scoreDisplay = new Text({
+			text: '12345',
+			alpha: 1,
+			anchor: {
+				x: 0.5,
+				y: 0.5
+			},
+			style: new PIXI.TextStyle({
+				align: 'center',
+				fontSize: 48,
+				fontFamily: fnt_exo_20_black,
+				fill: '#ff0000'
+			})
+		});
+		this.uiContainer.addChild(this.scoreDisplay);
+		this.scene.addChild(this.uiContainer);
 
 		document.addEventListener("keypress", (e)=>{
 			let lane;
@@ -62,6 +90,15 @@ class Game extends Token {
 		return AssetLoader.LoadAssetsFromAssetList(
 			OsuCommon.createAssetLoaderObjectFromRequiredFiles(reqFiles,hitobjects)
 		);
+	}
+
+	_updateScore() {
+		this.scoreDisplay.text = this.score.toString();
+	}
+
+	addScore(score) {
+		this.score += Math.abs(score);
+		this._updateScore();
 	}
 
 	getLane(index) {
@@ -93,7 +130,6 @@ class Game extends Token {
 			this.activeTrack.data['RequiredFiles'],
 			this.activeTrack.data['HitObjects']
 		).then(resources => {
-			console.log(resources);
 			this._requiredAssets = resources;
 			this.loadAudioBuffer(
 				`./assets/tracks/${_SELECTED_OSU_FILE}/${
@@ -110,6 +146,9 @@ class Game extends Token {
 				self._scheduleTimingPoints(self).then(() => {
 					console.log('Tpoints scheduled');
 				});
+				self._scheduleSampleEvents(self).then(() => {
+					console.log('Samples scheduled');
+				});
 				OsuCommon.playTrack(self.musicVolume, self);
 				//self._updateScore();
 				console.log('SETUP! (∩´∀｀)∩');
@@ -117,11 +156,39 @@ class Game extends Token {
 		});
 	}
 
+	async _scheduleSampleEvents(context) {
+		for (let k = 0; k < context.activeTrack.data['Events'].length; k++) {
+			let curr = context.activeTrack.data['Events'][k];
+			if(curr.type !== 'Sample') continue;
+
+			let timestamp = curr.time * 0.001;
+
+			context._trackClock.insert(timestamp, () => {
+				let filename = curr.file;
+				let file;
+				if(global[filename]){
+					file = global[filename];
+				} else if(context._requiredAssets[filename]){
+					file = context._requiredAssets[filename].sound;
+				} else {
+					console.log("COULD NOT PLAY SOUND %s", filename);
+				}
+				if(file){
+					//let backupVol = file.volume;
+					//file.volume = curr.volume * 0.002;
+					//file.play();
+					//file.volume = backupVol;
+					//console.log(file);
+				}
+			});
+		}
+	}
+
 	async _scheduleHitObjectSpawns(context) {
 		for (let k = 0; k < context.activeTrack.data['HitObjects'].length; k++) {
 			let current = context.activeTrack.data['HitObjects'][k];
 
-			let timestamp = current.time * 0.001 - context._preempt * 0.001;
+			let timestamp = current.time * 0.001 - ((context._preempt * 0.001)*2);
 
 			context._trackClock.insert(timestamp, () => {
 				let diff = Math.abs(timestamp - context.__AUDIOCTX.currentTime);
@@ -143,13 +210,13 @@ class Game extends Token {
 
 				//console.log("Spawning object %O in lane %i", current, lane);
 				//console.log();
+				current.time = Math.floor(timestamp * 1000);
 				this.spawnNote(lane, isHoldNote, current);
 			});
 		}
 	}
 
 	spawnNote(lane, isHoldNote, data){
-		console.log(`Spawning note with sampleset ${this._activeSampleSet}, sample index ${this._activeSampleIndex}, with the following sounds:`);
 		return this._lanes[lane].spawnNote(isHoldNote, {
 			spawnTime: Date.now(),
 			hitSounds: OsuCommon.getHitSound(data, this._activeSampleSet, this._activeSampleIndex, this._requiredAssets),

@@ -20,9 +20,11 @@ class ManiaNote extends GameObject {
 	}
 
 	_playSFX() {
+		if(this.hitSounds.length === 0) console.error('ARGH');
 		for (let i = 0; i < this.hitSounds.length; i++) {
 			if(this.hitSounds[i])
 				this.hitSounds[i].play();
+			else console.error("argh");
 		}
 	}
 

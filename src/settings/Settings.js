@@ -106,7 +106,7 @@ module.exports = global.Settings || {
 		t_spark: 'spark.png'
 	},
 
-	osuTracks: ['WAKE_ME_UP', 'STYX_HELIX', 'JUMPIN_JUMP_UP', 'STAY_ALIVE', 'TRAILER', 'ZANARKAND', 'THESIS'],
+	osuTracks: ['WAKE_ME_UP', 'STYX_HELIX', 'JUMPIN_JUMP_UP', 'STAY_ALIVE', 'TRAILER', 'ZANARKAND', 'THESIS', "SHELTER", "THEISLAND"],
 
 	OsuManiaSettings: {
 		ManiaLaneDefaults: {

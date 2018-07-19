@@ -87,12 +87,12 @@ class ManiaLane extends ContainerObject {
 	endStep(dt){
 		for(let i = this._notes.length - 1; i >= 0; i--){
 			// move down
-			this._notes[i].progressPreempt += dt / this._notes[i].preempt;
+			this._notes[i].progressPreempt += ((dt / this._notes[i].preempt) * 0.5);
 
-			this._notes[i].y = (
-					Settings.applicationSettings.height - 200 - this._notes[i].height
+			this._notes[i].y = ((
+					Settings.applicationSettings.height - 150 - this._notes[i].height
 				)
-			* this._notes[i].progressPreempt;
+			* this._notes[i].progressPreempt) + (-50);
 
 			if(this._notes[i].y > Settings.applicationSettings.height || this._notes[i].progressPreempt >= 1.5){
 				this._destroyNote(i);
@@ -125,6 +125,7 @@ class ManiaLane extends ContainerObject {
 					this.game._difficulty,
 					(curr.preempt * curr.progressPreempt) - curr.preempt
 				);
+				this.game.addScore(score);
 				curr._playSFX();
 				return;
 			} else {
