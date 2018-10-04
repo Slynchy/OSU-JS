@@ -255,7 +255,7 @@ class SliderHitObject extends ContainerObject {
 
 		this.comboText = new Text({
 			text: this.comboNumber.toString(),
-			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0,
+			rotation: Settings.GameSettings.landscapeMode ? -1.571 : 0,
 			anchor: {
 				x: 0.5,
 				y: 0.5

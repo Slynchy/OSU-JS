@@ -11,7 +11,6 @@ let AudioLoader = require('audio-loader');
 
 /**
  * Class for the normal version of Osu!
- * @deprecated
  */
 class Game_legacy extends Token {
 	constructor(osuFile, props) {
@@ -28,7 +27,7 @@ class Game_legacy extends Token {
 
 		this._offset = {
 			x: -(Settings.osuDefaults.Padding.x * 0.5),
-			y: -(Settings.osuDefaults.Padding.y * 0.5)
+			y: Settings.applicationSettings.height * 0.33
 		};
 
 		this.difficulty = this.activeTrack.data['Difficulty'];
@@ -37,7 +36,7 @@ class Game_legacy extends Token {
 		this._preempt = Game_legacy._calculatePreempt(this.activeTrack.data['Difficulty']);
 		this._circleSize = osuScale(
 			54.4 - 4.48 * this.activeTrack.data['Difficulty']['CircleSize']
-		);
+		) * 3;
 		this._activeMPB = 1000;
 		this._activeSampleSet = 'normal';
 		this.events = [];
@@ -58,27 +57,23 @@ class Game_legacy extends Token {
 		this.scene.addChild(this.bg);
 
 		this.customBg = new GameObject(t_black, {
-			x: Settings.applicationSettings.width / 2,
-			y: Settings.applicationSettings.height / 2,
+			x: 0,
+			y: 0,
 			alpha: 0,
 			width: Settings.applicationSettings.width,
-			height: Settings.applicationSettings.height,
-			anchor: {
-				x: 0.5,
-				y: 0.5
-			},
+			height: Settings.applicationSettings.height * 0.33,
 			z: -4
 		});
 		this.scene.addChild(this.customBg);
 
 		this.uiContainer = new ContainerObject({
-			x: Settings.GameSettings.portraitMode ? 50 : Settings.applicationSettings.width / 2,
-			y: Settings.GameSettings.portraitMode ? Settings.applicationSettings.height / 2 : 25,
+			x: Settings.GameSettings.landscapeMode ? 50 : Settings.applicationSettings.width / 2,
+			y: Settings.GameSettings.landscapeMode ? Settings.applicationSettings.height / 2 : 25,
 			anchor: {
 				x: 0.5,
 				y: 0.5
 			},
-			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0
+			rotation: Settings.GameSettings.landscapeMode ? -1.571 : 0
 		});
 
 		this.score = 0;
@@ -152,7 +147,7 @@ class Game_legacy extends Token {
 				if (resources['BG']) {
 					this.customBg.texture = resources['BG'].texture;
 
-					if (Settings.GameSettings.portraitMode) {
+					if (Settings.GameSettings.landscapeMode) {
 						this.customBg.rotation = -1.571;
 
 						const aspect =

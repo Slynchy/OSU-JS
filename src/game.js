@@ -44,7 +44,7 @@ class Game extends Token {
 				x: 0.5,
 				y: 0.5
 			},
-			rotation: Settings.GameSettings.portraitMode ? -1.571 : 0
+			rotation: Settings.GameSettings.landscapeMode ? -1.571 : 0
 		});
 		this.score = 0;
 		this.scoreDisplay = new Text({

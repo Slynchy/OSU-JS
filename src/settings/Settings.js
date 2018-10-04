@@ -1,4 +1,4 @@
-let game = require('../game.js');
+let game = require('../game_legacy.js');
 //let game_legacy: require('../game_legacy.js');
 let mainMenu = require('../Tokens/MainMenu.js');
 
@@ -44,7 +44,7 @@ module.exports = global.Settings || {
 	},
 
 	GameSettings: {
-		portraitMode: false
+		landscapeMode: false
 	},
 
 	Analytics: {
@@ -106,7 +106,7 @@ module.exports = global.Settings || {
 		t_spark: 'spark.png'
 	},
 
-	osuTracks: ['WAKE_ME_UP', 'STYX_HELIX', 'JUMPIN_JUMP_UP', 'STAY_ALIVE', 'TRAILER', 'ZANARKAND', 'THESIS', "SHELTER", "THEISLAND"],
+	osuTracks: ['STYX_HELIX'],
 
 	OsuManiaSettings: {
 		ManiaLaneDefaults: {
@@ -130,7 +130,7 @@ module.exports = global.Settings || {
 		ApproachRate: 3,
 		Padding: {
 			x: -256,
-			y: -100
+			y: -470
 		}
 	},
 

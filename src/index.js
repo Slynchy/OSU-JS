@@ -2,7 +2,7 @@
     (/・ω・)/
  */
 
-global._SELECTED_OSU_FILE = 'ZANARKAND';
+global._SELECTED_OSU_FILE = 'STYX_HELIX';
 
 import './styles/app.css';
 import fnt_exo_20_black from './assets/fonts/exo-20-black.ttf';
